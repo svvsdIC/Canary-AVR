@@ -136,6 +136,16 @@ ISR(USART1_RX_vect)
 	}
 	// Store received data in buffer 
 	UART1_RxBuf[tmphead] = data;
+	if (UART1_RxBuf[sizeof(UART1_RxBuf)] == 10)
+	{
+		if (UART1_RxBuf[4] == 'L')
+		{
+			for (uint8_t i = 4; i<= 59; i++)//copy bytes
+			{
+				//copy to string
+			}
+		}
+	}
 }
 
 ISR(USART1_UDRE_vect)

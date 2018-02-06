@@ -61,7 +61,8 @@ int main(void)
 	// initialize_timer_counter_0();  // ONLY ENABLE if using SD card
 	//
 	// Initialize our main communication to the ground (UART0)
-	USART0_init(MYUBRR0);
+	//USART0_init(MYUBRR0);
+	USART1_init(MYUBRR1);
 	//
 	// Initialize the TWI peripheral
 	TWI_Master_Initialise();
@@ -163,7 +164,7 @@ int main(void)
 			//
 			//============================
 			// Read the GPS unit;
-			GPSRun();
+//			GPSRun();
 			// Davita has this routine specified in the notebook.
 			//============================
 			//

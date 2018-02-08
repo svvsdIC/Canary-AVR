@@ -13,7 +13,7 @@
 *	}
 *Zero.Buffer}
 */
-#include "canary_common.h"
+/*#include "canary_common.h"
 unsigned char GPSRun(void)
 {
 	extern UART1_RxBuf[UART1_RX_BUFFER_SIZE];
@@ -28,4 +28,4 @@ unsigned char GPSRun(void)
 		}
 		UART1_RxBuf = 0;
 	}
-}
+}*/

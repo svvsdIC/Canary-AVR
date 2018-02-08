@@ -15,6 +15,7 @@
 						Includes
 ********************************************************************************/
 #include "canary_common.h" // Contains all Canary Project global definitions
+#include "BME280.h"
 #include <avr/io.h>		// Contains the standard IO definitions
 
 /********************************************************************************
@@ -80,6 +81,17 @@ int main(void)
 	//
 	// Initialize the pressure / temperature /  humidity sensor
 	// BME280_init(); 
+	// Create an instance of bme280_dev to initialize the BME280
+	struct bme280_dev dev;
+	int8_t rslt = BME280_OK;
+
+	dev.dev_id = BME280_I2C_ADDR_PRIM;
+	dev.intf = BME280_I2C_INTF;
+	dev.read = user_i2c_read;
+	dev.write = user_i2c_write;
+	// dev.delay_ms = user_delay_ms; // Do we need this?
+	
+	rslt = bme280_init(&dev);
 	//
 	// Initialize the GPS module
 	// USART1_init(MYBURR1);
@@ -157,7 +169,7 @@ int main(void)
 			// Now test reading the LIDAR interface
 			distance = LIDAR_distance();
 			printf("\nLIDAR distance = %u", distance);
-			GPSRun();
+			//GPSRun();
 			//============================
 			//
 			//============================

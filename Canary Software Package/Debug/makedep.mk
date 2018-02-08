@@ -4,7 +4,7 @@
 
 adc.c
 
-BME280.c
+bme280.c
 
 canary_common.c
 

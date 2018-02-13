@@ -28,6 +28,8 @@ static volatile unsigned char UART1_RxTail;
 static unsigned char UART1_TxBuf[UART1_TX_BUFFER_SIZE];
 static volatile unsigned char UART1_TxHead;
 static volatile unsigned char UART1_TxTail;
+unsigned char UART1_RxBuf [UART1_RX_BUFFER_SIZE];
+unsigned char messageWant [UART1_RX_BUFFER_SIZE];
 
 /********************************************************************************
 *********************************************************************************
@@ -136,15 +138,22 @@ ISR(USART1_RX_vect)
 	}
 	// Store received data in buffer 
 	UART1_RxBuf[tmphead] = data;
-	if (UART1_RxBuf[sizeof(UART1_RxBuf)] == 10)
+
+	if (data == 10)
 	{
-		if (UART1_RxBuf[4] == 'L')
+		USART0_TransmitByte('n');
+		if (UART1_RxBuf[5] == 'L')
 		{
-			for (uint8_t i = 4; i<= 59; i++)//copy bytes
+			USART0_TransmitByte(UART1_RxBuf[5]);
+			for (uint8_t i = 0; i<= 59; i++)
 			{
-				//copy to string
+				messageWant[i] = UART1_RxBuf[i];
+
 			}
+			data = data + 1;
 		}
+		UART1_RxTail = 0;
+		UART1_RxHead = 0;
 	}
 }
 

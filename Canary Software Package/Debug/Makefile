@@ -41,7 +41,6 @@ C_SRCS +=  \
 ../BME280.c \
 ../canary_common.c \
 ../gas_sensors.c \
-../GPS.c \
 ../LIDAR.c \
 ../main.c \
 ../RGBsensor.c \
@@ -62,7 +61,6 @@ adc.o \
 BME280.o \
 canary_common.o \
 gas_sensors.o \
-GPS.o \
 LIDAR.o \
 main.o \
 RGBsensor.o \
@@ -76,7 +74,6 @@ adc.o \
 BME280.o \
 canary_common.o \
 gas_sensors.o \
-GPS.o \
 LIDAR.o \
 main.o \
 RGBsensor.o \
@@ -90,7 +87,6 @@ adc.d \
 BME280.d \
 canary_common.d \
 gas_sensors.d \
-GPS.d \
 LIDAR.d \
 main.d \
 RGBsensor.d \
@@ -104,7 +100,6 @@ adc.d \
 BME280.d \
 canary_common.d \
 gas_sensors.d \
-GPS.d \
 LIDAR.d \
 main.d \
 RGBsensor.d \
@@ -149,13 +144,6 @@ LINKER_SCRIPT_DEP+=
 	
 
 ./gas_sensors.o: .././gas_sensors.c
-	@echo Building file: $<
-	@echo Invoking: AVR/GNU C Compiler : 4.9.2
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega324pa -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\gcc\dev\atmega324pa" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
-./GPS.o: .././GPS.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.9.2
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega324pa -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\gcc\dev\atmega324pa" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

@@ -36,7 +36,7 @@
 #endif
 
 // Calculate the baud rate register value using equations from the data sheet
-#define BAUD0 4800
+#define BAUD0 9600
 #define MYUBRR0 F_CPU/16/BAUD0-1
 
 

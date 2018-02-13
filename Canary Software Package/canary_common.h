@@ -31,8 +31,6 @@
 #include "TWI_Master.h"   // I2C routines and initialization
 #include "RGBsensor.h"  // Not needed for production - here to test I2C
 #include "LIDAR.h"	//LIDAR specific routines
-#include "GPS.h" ///GPS Specific routines
-//#include "BME280.h"
 
 // ************** The following are needed for the file system and MicroSD card
 //#include <avr/pgmspace.h>
@@ -78,8 +76,8 @@
 // This variable starts the data collection loop in main
 volatile uint8_t ItsTime;
 // This next line opens a virtual file that writes to the serial port
-static FILE mystdout = FDEV_SETUP_STREAM(USART1_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
-
+static FILE mystdout1 = FDEV_SETUP_STREAM(USART1_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
+static FILE mystdout0 = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
 /********************************************************************************
 						Function Prototypes
 ********************************************************************************/

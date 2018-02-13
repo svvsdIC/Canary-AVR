@@ -10,8 +10,6 @@ canary_common.c
 
 gas_sensors.c
 
-GPS.c
-
 LIDAR.c
 
 main.c

@@ -24,7 +24,6 @@
 ********************************************************************************/
 /* UART Buffer Defines - make them long enough for the GPS messages */
 #define UART1_RX_BUFFER_SIZE 256     /* 2,4,8,16,32,64,128 or 256 bytes */
-unsigned char UART1_RxBuf [UART1_RX_BUFFER_SIZE]
 #define UART1_TX_BUFFER_SIZE 256
 #define UART1_RX_BUFFER_MASK (UART1_RX_BUFFER_SIZE - 1)
 #if (UART1_RX_BUFFER_SIZE & UART1_RX_BUFFER_MASK)

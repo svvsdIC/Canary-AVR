@@ -29,6 +29,7 @@
 volatile uint16_t u16data = 10, seconds; 
 uint8_t debugdata;
 char String[]="Hello World!! The serial port is working!";
+extern unsigned char messageWant [UART1_RX_BUFFER_SIZE];
 
 /********************************************************************************
 						Functions
@@ -52,7 +53,7 @@ int main(void)
 	ItsTime=0;
 	//
 	// set up our output for handling printf and string operations,,,
-	stdout = &mystdout;
+	stdout = &mystdout0;
 	//
 	// Initialize the timer counter 1 for 1Hz interrupt
 	initialize_timer_counter_1();
@@ -61,7 +62,7 @@ int main(void)
 	// initialize_timer_counter_0();  // ONLY ENABLE if using SD card
 	//
 	// Initialize our main communication to the ground (UART0)
-	//USART0_init(MYUBRR0);
+	USART0_init(MYUBRR0);
 	USART1_init(MYUBRR1);
 	//
 	// Initialize the TWI peripheral
@@ -129,6 +130,25 @@ int main(void)
 			// - go to the next sensor 
 			// ....
 			printf("hi");
+			/*for (uint8_t i = 0; i<= 20; i++)
+			{
+				USART0_TransmitByte(messageWant[i]);
+			}*/
+			//GPS Message
+			printf("Where were are:");
+			for (uint8_t i = 6; i<= 30; i++)
+			{
+				USART0_TransmitByte(messageWant[i]);
+			}
+			printf("time:");
+			for (uint8_t i = 31; i<= 41; i++)
+			{
+				USART0_TransmitByte(messageWant[i]);
+				if(i%2 == 0)
+				{
+					printf(":");
+				}
+			}
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
 			//   2. Kick off the gas sensor reads - and go back for the results in a few milliseconds.  

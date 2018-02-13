@@ -172,12 +172,6 @@
     <Compile Include="gas_sensors.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="GPS.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="GPS.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="LIDAR.c">
       <SubType>compile</SubType>
     </Compile>

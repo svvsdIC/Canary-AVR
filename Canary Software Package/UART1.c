@@ -15,6 +15,7 @@
 						Includes
 ********************************************************************************/
 #include "UART1.h"
+#include "UART0.h" // remove once this is debugged
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdio.h>
@@ -29,7 +30,7 @@ static unsigned char UART1_TxBuf[UART1_TX_BUFFER_SIZE];
 static volatile unsigned char UART1_TxHead;
 static volatile unsigned char UART1_TxTail;
 unsigned char UART1_RxBuf [UART1_RX_BUFFER_SIZE];
-unsigned char messageWant [UART1_RX_BUFFER_SIZE];
+char messageWant [UART1_RX_BUFFER_SIZE];
 
 /********************************************************************************
 *********************************************************************************
@@ -125,6 +126,7 @@ ISR(USART1_RX_vect)
 {
 	unsigned char data;
 	unsigned char tmphead;
+	uint8_t i;
 	
 	// Read the received data 
 	data = UDR1;
@@ -139,19 +141,19 @@ ISR(USART1_RX_vect)
 	// Store received data in buffer 
 	UART1_RxBuf[tmphead] = data;
 
-	if (data == 10)
+	if (data == 10) //See if it is the end of a GPS message...
 	{
-		USART0_TransmitByte('n');
-		if (UART1_RxBuf[5] == 'L')
+		USART0_TransmitByte('n'); // debug statement.  Watch the UART window
+		if (UART1_RxBuf[5] == 'L')  // If so, see if this is the message we want to capture
 		{
-			USART0_TransmitByte(UART1_RxBuf[5]);
-			for (uint8_t i = 0; i<= 59; i++)
+			USART0_TransmitByte(UART1_RxBuf[5]); // debug statement.  Watch the UART window
+			for (i = 0; i<= tmphead; i++) // Copy the full GLL message.
 			{
 				messageWant[i] = UART1_RxBuf[i];
-
 			}
-			data = data + 1;
+			messageWant[i+1]=0x00; //Add a null character at the end so we can treat this like a string variable
 		}
+		// Zero the receive buffer so it is ready for the next message format.
 		UART1_RxTail = 0;
 		UART1_RxHead = 0;
 	}

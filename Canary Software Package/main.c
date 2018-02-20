@@ -29,7 +29,7 @@
 volatile uint16_t u16data = 10, seconds; 
 uint8_t debugdata;
 char String[]="Hello World!! The serial port is working!";
-extern unsigned char messageWant [UART1_RX_BUFFER_SIZE];
+extern char messageWant [UART1_RX_BUFFER_SIZE];
 
 /********************************************************************************
 						Functions
@@ -106,7 +106,7 @@ int main(void)
  	// *************************************************************************
  	// main loop
  	// *************************************************************************
-    printf("hi ");
+    printf("Starting main loop.");
 	while (1) 
     {
 		///////////////////////////////////////////////////////////
@@ -129,14 +129,10 @@ int main(void)
 			// - Send the data over the serial port
 			// - go to the next sensor 
 			// ....
-			printf("hi");
-			/*for (uint8_t i = 0; i<= 20; i++)
-			{
-				USART0_TransmitByte(messageWant[i]);
-			}*/
 			//GPS Message
 			printf("Where were are:");
-			for (uint8_t i = 6; i<= 30; i++)
+			USART0_putstring(&messageWant[0]);
+/*			for (uint8_t i = 0; i<= 30; i++) // The next few lines are commented out and can be deleted once the line above is tested.
 			{
 				USART0_TransmitByte(messageWant[i]);
 			}
@@ -148,7 +144,8 @@ int main(void)
 				{
 					printf(":");
 				}
-			}
+			} 
+*/
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
 			//   2. Kick off the gas sensor reads - and go back for the results in a few milliseconds.  
@@ -168,6 +165,7 @@ int main(void)
 			//
 			//============================
 			// Craig's test of the I2C interface:
+			// REPLACE with BME code when completed...
 /*			TWI_XFER_STATUS = read_RGB_values();
 			printf("\nraw clear = %u", raw_clear);
 			printf("\nraw red   = %u", raw_red);
@@ -183,12 +181,6 @@ int main(void)
 			//============================
 			//
 			//============================
-			// Read the GPS unit;
-//			GPSRun();
-			// Davita has this routine specified in the notebook.
-			//============================
-			//
-			//============================
 			// Now test the gas sensor interface...
 			// start_gas_sensor_read();
 			// Note that this is a blocking read (stops all other activity)
@@ -199,11 +191,6 @@ int main(void)
 // 			printf("\nAmmonia = %u", raw_gas_vector[2]);
 // 			printf("\nMethane = %u", raw_gas_vector[3]);
 // 			printf("\nOzone = %u\n", raw_gas_vector[4]);
-			//============================
-			//
-			//============================
-			// Now test the BME interface...
-			// THIS ROUTINE NOT YET WRITTEN
 			//============================
 			//
 			// That completes the sensor sweep		

@@ -110,14 +110,14 @@
 #define BME280_64BIT_ENABLE
 #endif
 #endif
-
+/*
 #ifndef TRUE
 #define TRUE                UINT8_C(1)
 #endif
 #ifndef FALSE
 #define FALSE               UINT8_C(0)
 #endif
-
+*/
 /**\name I2C addresses */
 #define BME280_I2C_ADDR_PRIM	UINT8_C(0x76)
 #define BME280_I2C_ADDR_SEC		UINT8_C(0x77)

@@ -45,7 +45,7 @@ void USART0_init(uint16_t ubrr_val)
 	UBRR0L = (unsigned char) ubrr_val;
 	// Enable UART0 receiver, transmitter, and the receive complete interrupt
 	UCSR0B = ((1<<RXEN0) | (1<<TXEN0) | (1<<RXCIE0));
-	// Set UART mode and frame format: 8 data, 2 stop bits, no parity
+	// Set UART mode and frame format: 8 data, 1 stop bits, no parity
 	UCSR0C = (3<<UCSZ00) | (1<<USBS0);	
 
 	/* Flush receive buffer */

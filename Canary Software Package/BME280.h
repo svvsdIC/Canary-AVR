@@ -60,7 +60,9 @@ extern "C" {
 
 /* Header includes */
 #include "bme280_defs.h"
+#include "TWI_Master.h"
 #include <stdint.h>
+#include <util/delay.h>
 
 /*!
  *  @brief This API is the entry point.
@@ -234,11 +236,12 @@ void bme280_parse_sensor_data(const uint8_t *reg_data, struct bme280_uncomp_data
 int8_t bme280_compensate_data(uint8_t sensor_comp, const struct bme280_uncomp_data *uncomp_data,
 				     struct bme280_data *comp_data, struct bme280_calib_data *calib_data);
 
+int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
+int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
+void user_delay_ms(uint32_t period);					 
+
 #ifdef __cplusplus
 }
 #endif /* End of CPP guard */
 #endif /* BME280_H_ */
 /** @}*/
-
-int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
-int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);

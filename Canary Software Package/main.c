@@ -29,11 +29,31 @@
 // These first few variables are here for debug purposes... ---UART STUFF
 volatile uint16_t u16data = 10, seconds; 
 uint8_t debugdata;
+// This variable starts the data collection loop in main
+volatile uint8_t ItsTime;
+// This next line opens a virtual file that writes to the serial port
+static FILE mystdout = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
+// And a string for debug purposes.
 char String[]="Hello World!! The serial port is working!";
+// BME280 stuff - needs to be relocated eventually  ----------------------------
+struct bme280_dev dev;
+int8_t rslt = BME280_OK;
+// -------------------------------------------------------------------------------
 
 /********************************************************************************
 						Functions
 ********************************************************************************/
+
+void bme280_structure_and_device_init(void) {
+	dev.dev_id = BME280_I2C_ADDR_PRIM;
+	dev.intf = BME280_I2C_INTF;
+	dev.read = user_i2c_read;
+	dev.write = user_i2c_write;
+	dev.delay_ms = user_delay_ms;
+	// Call the HW initialization routine
+	rslt = bme280_init(&dev);
+	
+}
 
 /********************************************************************************
 						Main
@@ -79,19 +99,9 @@ int main(void)
 	// Start all interrupts
 	sei();
 	//
-	// Initialize the pressure / temperature /  humidity sensor
-	// BME280_init(); 
 	// Create an instance of bme280_dev to initialize the BME280
-	struct bme280_dev dev;
-	int8_t rslt = BME280_OK;
-
-	dev.dev_id = BME280_I2C_ADDR_PRIM;
-	dev.intf = BME280_I2C_INTF;
-	dev.read = user_i2c_read;
-	dev.write = user_i2c_write;
-	// dev.delay_ms = user_delay_ms; // Do we need this?
-	
-	rslt = bme280_init(&dev);
+	// Initialize the pressure / temperature /  humidity sensor
+	bme280_structure_and_device_init();
 	//
 	// Initialize the GPS module
 	// USART1_init(MYBURR1);
@@ -105,7 +115,7 @@ int main(void)
 	
 	// ===================================================
 	// The next few lines are for debugging the (working at one time) UART0 routines...remove these lines once it is working again.
-	//USART0_putstring(String);
+	USART0_putstring(String);
 	// Send another text message via our std out using printf
 	//printf("Hi, again, world.\n");
 	//Now try to write debug data to the computer
@@ -163,8 +173,8 @@ int main(void)
 			printf("\nraw green = %u", raw_green);
 			printf("\nraw blue  = %u", raw_blue);
 			printf("\n=================");
-			//============================
-	*/		//
+*/			//============================
+			//
 			//============================
 			// Now test reading the LIDAR interface
 			distance = LIDAR_distance();

@@ -1335,29 +1335,38 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
 	
 	// Write device address (for writing)
 	BMEmessageBuf[0] = dev_id << 1; // Device ID is 0x76 if SDO is connected to ground and 0x77 if SDO is connected to VDDIO
-	//
+	
 	// Write the register address from which we want to start reading 
 	BMEmessageBuf[1] = reg_addr;
+	
 	// Send the ID and register data out onto the TWI bus...
-	TWI_Start_Transceiver_With_Data(&messageBuf[0], 2); // Send register address
+	TWI_Start_Transceiver_With_Data(&BMEmessageBuf[0], 2); // Send register address
+	
 	// And wait for the transaction to complete...
 	while(TWI_Transceiver_Busy())
 	{
+		// Wait
 	}
+	
 	// Now go tell the device to send the data (set the read bit)... 
 	BMEmessageBuf[0] = (dev_id << 1) | 1; // Now we want to do the read
-	TWI_Start_Transceiver_With_Data(&messageBuf[0], 1); 
+	
+	TWI_Start_Transceiver_With_Data(&BMEmessageBuf[0], 1); 
+	
 	// And wait for the transaction to complete...
 	while(TWI_Transceiver_Busy())
 	{
+		// Wait
 	}
+	
 	// Data is received, now go get it from the AVR TWI data structure...
-	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(&BMEmessageBuf[0], len+1); 
+	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(&BMEmessageBuf[0], len);
+	 
 	// The data is now in our own BMEmessageBuf.  IF WE NEED TO, copy it to another variable 
 	// before it gets overwritten by another exchange...
 	for (i = 0; i < len; i++)
 	{
-		 BME_data[i] = BMEmessageBuf[i + 1];
+		 BME_data[i] = BMEmessageBuf[i];
 	}
 	
 	// If something bad has happened, rslt = 1

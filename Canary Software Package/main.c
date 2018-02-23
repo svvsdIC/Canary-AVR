@@ -117,7 +117,7 @@ int main(void)
 	// The next few lines are for debugging the (working at one time) UART0 routines...remove these lines once it is working again.
 	USART0_putstring(String);
 	// Send another text message via our std out using printf
-	//printf("Hi, again, world.\n");
+	printf("Hi, again, world.\n");
 	//Now try to write debug data to the computer
 	//printf("\nunsigned int = %u", u16data);
 	//printf("\nPORTA = %u\n", PINA);
@@ -177,8 +177,8 @@ int main(void)
 			//
 			//============================
 			// Now test reading the LIDAR interface
-			distance = LIDAR_distance();
-			printf("\nLIDAR distance = %u", distance);
+			// distance = LIDAR_distance();
+			// printf("\nLIDAR distance = %u", distance);
 			//GPSRun();
 			//============================
 			//

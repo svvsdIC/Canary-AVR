@@ -69,13 +69,13 @@ int main(void)
 	TWI_Master_Initialise();
 	//
 	// Initialize the Analog to digital hardware - and test the I/F.
-	//ADC_init();
+	ADC_init();
 	//
 	// FOR DEBUG ONLY: Initialize the RGB sensor - Craig uses this to ensure I2C is working
 //	RGBsensor_init();
 	//
  	// initialize the gas sensors
-	//gas_sensors_init();
+	gas_sensors_init();
 	// 
 	// Start all interrupts
 	sei();
@@ -84,7 +84,6 @@ int main(void)
 	// BME280_init(); 
 	//
 	// Initialize the GPS module
-	// USART1_init(MYBURR1);
 	//
 	// Now that we've tried to initialize everything, we need to report status to the three LEDs sitting on
 	// the circuit board...the current placeholder routine does not do this so well.  Need to rethink this.
@@ -95,7 +94,7 @@ int main(void)
 	
 	// ===================================================
 	// The next few lines are for debugging the (working at one time) UART0 routines...remove these lines once it is working again.
-	//USART0_putstring(String);
+	USART0_putstring(String);
 	// Send another text message via our std out using printf
 	//printf("Hi, again, world.\n");
 	//Now try to write debug data to the computer
@@ -130,22 +129,11 @@ int main(void)
 			// - go to the next sensor 
 			// ....
 			//GPS Message
-			printf("Where were are:");
-			USART0_putstring(&messageWant[0]);
-/*			for (uint8_t i = 0; i<= 30; i++) // The next few lines are commented out and can be deleted once the line above is tested.
+			//USART0_putstring(&messageWant[0]);
+		for (uint8_t i = 0; i<= 50; i++) // The next few lines are commented out and can be deleted once the line above is tested.
 			{
 				USART0_TransmitByte(messageWant[i]);
 			}
-			printf("time:");
-			for (uint8_t i = 31; i<= 41; i++)
-			{
-				USART0_TransmitByte(messageWant[i]);
-				if(i%2 == 0)
-				{
-					printf(":");
-				}
-			} 
-*/
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
 			//   2. Kick off the gas sensor reads - and go back for the results in a few milliseconds.  
@@ -176,21 +164,21 @@ int main(void)
 	*/		//
 			//============================
 			// Now test reading the LIDAR interface
-			//distance = LIDAR_distance();
-			//printf("\nLIDAR distance = %u", distance);
+			distance = LIDAR_distance();
+			printf("\nLIDAR distance = %u", distance);
 			//============================
 			//
 			//============================
 			// Now test the gas sensor interface...
-			// start_gas_sensor_read();
+			start_gas_sensor_read();
 			// Note that this is a blocking read (stops all other activity)
 			// At present, the print statements are in that routine....
 			//...but the routine needs to be redesigned to operate in the background
-// 			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
-// 			printf("\nHydrogen = %u", raw_gas_vector[1]);
-// 			printf("\nAmmonia = %u", raw_gas_vector[2]);
-// 			printf("\nMethane = %u", raw_gas_vector[3]);
-// 			printf("\nOzone = %u\n", raw_gas_vector[4]);
+ 			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
+ 			printf("\nHydrogen = %u", raw_gas_vector[1]);
+ 			printf("\nAmmonia = %u", raw_gas_vector[2]);
+ 			printf("\nMethane = %u", raw_gas_vector[3]);
+ 			printf("\nOzone = %u\n", raw_gas_vector[4]);
 			//============================
 			//
 			// That completes the sensor sweep		

@@ -143,10 +143,10 @@ ISR(USART1_RX_vect)
 
 	if (data == 10) //See if it is the end of a GPS message...
 	{
-		USART0_TransmitByte('n'); // debug statement.  Watch the UART window
+		//USART0_TransmitByte('n'); // debug statement.  Watch the UART window
 		if (UART1_RxBuf[5] == 'L')  // If so, see if this is the message we want to capture
 		{
-			USART0_TransmitByte(UART1_RxBuf[5]); // debug statement.  Watch the UART window
+			//USART0_TransmitByte(UART1_RxBuf[5]); // debug statement.  Watch the UART window
 			for (i = 0; i<= tmphead; i++) // Copy the full GLL message.
 			{
 				messageWant[i] = UART1_RxBuf[i];

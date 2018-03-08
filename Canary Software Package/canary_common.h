@@ -10,7 +10,7 @@
 /********************************************************************************
     Define CPU frequency before the includes to avoid definition errors...
 ********************************************************************************/
-#define F_CPU 20000000UL
+// #define F_CPU 20000000UL  //NOW DEFINED IN COMPILER SYMBOLS
 
 /********************************************************************************
 						Includes
@@ -76,7 +76,7 @@
 // This variable starts the data collection loop in main
 volatile uint8_t ItsTime;
 // This next line opens a virtual file that writes to the serial port
-static FILE mystdout1 = FDEV_SETUP_STREAM(USART1_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
+// static FILE mystdout1 = FDEV_SETUP_STREAM(USART1_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
 static FILE mystdout0 = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
 /********************************************************************************
 						Function Prototypes

@@ -143,7 +143,7 @@ ISR(USART1_RX_vect)
 
 	if (data == 10) //See if it is the end of a GPS message...
 	{
-		if (UART1_RxBuf[5] == 'L')  // If so, see if this is the message we want to capture
+		if (UART1_RxBuf[5] == 'L')  // Then if the 6th element is an L, this is the message we want to capture
 		{
 			for (i = 0; i<= tmphead; i++) // Copy the full GLL message.
 			{

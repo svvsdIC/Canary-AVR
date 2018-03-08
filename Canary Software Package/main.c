@@ -90,8 +90,8 @@ int main(void)
 	// Now call the routines to "kick off" the sensor measurements
 	
 	// ===================================================
-	// The next few lines are for debugging the UART0 routines...remove these lines once it is working again.
-	//USART0_putstring(String);
+	// The next few lines are for debugging the (working at one time) UART0 routines...remove these lines once it is working again.
+	USART0_putstring(String);
 	// ====================================================
 	////////////////////////////////////////////////////////////////////////////
  	// *************************************************************************
@@ -155,11 +155,11 @@ int main(void)
 			// Note that this is a blocking read (stops all other activity)
 			// At present, the print statements are in that routine....
 			//...but the routine needs to be redesigned to operate in the background
-			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
-			printf("\nHydrogen = %u", raw_gas_vector[1]);
-			printf("\nAmmonia = %u", raw_gas_vector[2]);
-			printf("\nMethane = %u", raw_gas_vector[3]);
-			printf("\nOzone = %u\n", raw_gas_vector[4]);
+ 			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
+ 			printf("\nHydrogen = %u", raw_gas_vector[1]);
+ 			printf("\nAmmonia = %u", raw_gas_vector[2]);
+ 			printf("\nMethane = %u", raw_gas_vector[3]);
+ 			printf("\nOzone = %u\n", raw_gas_vector[4]);
 			//============================
 			//
 			// That completes the sensor sweep		

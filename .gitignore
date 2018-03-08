@@ -19,6 +19,7 @@
 bld/
 [Bb]in/
 [Oo]bj/
+"Canary Software Package/Debug/"
  
 # Atmel/Visual Studio cache/options directory
 

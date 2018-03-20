@@ -122,10 +122,10 @@ int main(void)
 			// ....
 			//GPS Message
 			//USART0_putstring(&messageWant[0]);
-			for (uint8_t i = 0; i<= 50; i++) // The next few lines are commented out and can be deleted once the line above is tested.
-			{
-				USART0_TransmitByte(messageWant[i]);
-			}
+// 			for (uint8_t i = 0; i<= 50; i++) // The next few lines are commented out and can be deleted once the line above is tested.
+// 			{
+// 				USART0_TransmitByte(messageWant[i]);
+// 			}
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
 			//   2. Kick off the gas sensor reads - and go back for the results in a few milliseconds.  
@@ -145,8 +145,8 @@ int main(void)
 			//
 			//============================
 			// Now test reading the LIDAR interface
-			distance = LIDAR_distance();
-			printf("\nLIDAR distance = %u", distance);
+// 			distance = LIDAR_distance();
+// 			printf("\nLIDAR distance = %u", distance);
 			//============================
 			//
 			//============================

@@ -16,6 +16,8 @@
 ********************************************************************************/
 #include "canary_common.h" // Contains all Canary Project global definitions
 #include <avr/io.h>		// Contains the standard IO definitions
+#include "BME280.h"
+#include "bme280_defs.h"
 
 /********************************************************************************
 						Macros and Defines
@@ -26,14 +28,218 @@
 						Global Variables
 ********************************************************************************/
 // These first few variables are here for debug purposes... ---UART STUFF
-volatile uint16_t u16data = 10, seconds; 
-uint8_t debugdata;
+volatile uint16_t seconds; 
+uint8_t BMEtriggerbyte; //, debugdata;
+long rawPress, rawTemp, rawHum, t_fine, tempCelsius;
+char messageWant [UART1_RX_BUFFER_SIZE];
+// Correction parameters for Temperature
+uint16_t dig_T1;
+short dig_T2, dig_T3;
+// This variable starts the data collection loop in main
+extern volatile uint8_t ItsTime;
+// This next line opens a virtual file that writes to the serial port
+static FILE mystdout = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
+// And a string for debug purposes.
 char String[]="Hello World!! The serial port is working!";
-extern char messageWant [UART1_RX_BUFFER_SIZE];
+// To test basic functionality of the BME280...
+unsigned char BMEmessageBuf[TWI_BUFFER_SIZE], RawBMEdata[8];
+// BME280 stuff - needs to be relocated eventually  ----------------------------
+// struct bme280_dev dev;
+// int8_t rslt = BME280_OK;
+// -------------------------------------------------------------------------------
 
 /********************************************************************************
 						Functions
 ********************************************************************************/
+// void bme280_structure_and_device_init(void) {
+// 	dev.dev_id = BME280_I2C_ADDR_PRIM;
+// 	dev.intf = BME280_I2C_INTF;
+// 	dev.read = user_i2c_read;
+// 	dev.write = user_i2c_write;
+// 	dev.delay_ms = user_delay_ms;
+// 	// Call the HW initialization routine
+// 	rslt = bme280_init(&dev);
+// }
+
+void BME_read_correction_coefficients(void) {
+	// This routine (will) reads the corrective coefficients for temperature, pressure, and humidity...
+	static uint8_t i;
+	// Just reading temperature for now...
+	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+	BMEmessageBuf[1] = 0x88; // The register we want to start reading from
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2);
+	// Let initialization transaction complete...
+	while ( TWI_Transceiver_Busy() );
+	// Now for the read part...
+	// Bytes to read = (number_of_bytes_to_read (on next cycle) +1).
+	BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 7); //We want six bytes back, so use 7 in the function call.
+	// Let initialization transaction complete...
+	while ( TWI_Transceiver_Busy() );
+	// Now get the data we just read...note this call just copies the data from the TWI routine buffer to our local buffer (BMEmessageBuf)...
+	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 7);
+	// Note that the data we want starts in BMEmessageBuf[1], not BMEmessageBuf[0]
+	// Transfer the data to a variable we can manipulate to get our data out...
+	for (i=0;i<6;i++) 	{
+		RawBMEdata[i] = BMEmessageBuf[i+1];
+	}
+	dig_T1 = RawBMEdata[0] | (RawBMEdata[1]<<8); //0x7069;
+	dig_T2 = RawBMEdata[2] | (RawBMEdata[3]<<8); //0x6738;
+	dig_T3 = RawBMEdata[4] | (RawBMEdata[5]<<8); //0x32;
+}
+
+
+/*void bme280basic_init(void) {
+	// This routine resets the BME280 then checks the chip ID to see if it is the right device.
+	//
+	// Process for writing data to registers for the BME280:
+	// 1) First byte is the sensor I2C address (x2) and the read/write bit set to 0
+	// 2) Second byte is the register to which to write the data value
+	// 3) Third byte is the data value to be written tot he register identified in 2 above
+	// Repeat 2 and three for each byte to be written if there is to be more than one register written at a time.
+	// Send the array of bytes
+	//
+	// The process for reading data from the BME280:
+	// 1) First byte is the sensor I2C address (x2) and the read/write bit set to 0
+	// 2) Second byte is the register from which to start reading data values (auto increment allows you to read more than 1 byte).
+	// 3) Send the two bytes and restart
+	// 4) First byte is the sensor I2C address (x2) and the read/write bit set to 1
+	// 5) Start the transaction and send a NACK after you've received the last byte you want.
+	//
+	// First, reset the device per section 5.4.2 of the data sheet
+	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+	BMEmessageBuf[1] = 0xE0; // The register we want to write to
+	BMEmessageBuf[2] = 0xB6; // This value forces a reset to the device
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 3);
+	// Wait for the transaction to complete...
+	while ( TWI_Transceiver_Busy() );
+	//
+	// Now read the chip ID from register 0x0D
+	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+	BMEmessageBuf[1] = 0xD0; // The register we want to read from
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2);
+	// Let initialization transaction complete...
+	while ( TWI_Transceiver_Busy() );
+	// Now for the read part...
+	// Bytes to read = (number_of_bytes_to_read (on next cycle) +1). Zero origin.   If we want to read one byte, we pass "2".
+	BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2); //We only want one byte back, so use 2 in the function call.
+	// Let initialization transaction complete...
+	while ( TWI_Transceiver_Busy() );
+	// Now get the data we just read...note this call just copies the data from the TWI routine buffer to our local buffer (BMEmessageBuf)...
+	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 2);
+	// Note that the data we want starts in BMEmessageBuf[1], not BMEmessageBuf[0]
+	if (BMEmessageBuf[1]==0x60) { 
+		// We're talking to the right device.  Set up the control registers...
+		//
+		// We want Humidity oversampling set to x1 (ctrl_hum (0xF2) [2:0] = 0b001)
+		BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+		BMEmessageBuf[1] = 0xF2; // The register we want to write to
+		BMEmessageBuf[2] = 0x01; // Set humidity oversampling to x1
+		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 3);
+		// Wait for the transaction to complete...
+		while ( TWI_Transceiver_Busy() );
+		//		
+		//Set Tstandby to its smallest value (0)
+		//  Per table 12 and 28 we want the filter coefficient at 16 (config (0xF5) [4:2] = 0b100)
+		BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+		BMEmessageBuf[1] = 0xF5; // The register we want to write to
+		BMEmessageBuf[2] = (0b100<<2); // Set temp, pressure, and mode
+		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 3);
+		// Wait for the transaction to complete...
+		while ( TWI_Transceiver_Busy() );
+		//
+		BME_read_correction_coefficients();
+		// We want Temperature oversampling set to x1 (ctrl_meas (0xF4) [7:5] = 0b001)
+		// We want Pressure oversampling set to x8 (ctrl_meas (0xF4) [4:2] = 0b100)
+		// Put the device into Forced mode (we want to tell the device to "go measure") (ctrl_meas (0xF4) [1:0] = 0b01)
+		BMEtriggerbyte = (0b01<<5) | (0b100<<2) | (0b01<<0);
+		// NOTE: THIS BYTE MUST BE RESENT EACH TIME TO GET A NEW MEASUREMENT
+		BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+		BMEmessageBuf[1] = 0xF4; // The register we want to write to
+		BMEmessageBuf[2] = BMEtriggerbyte; // Set temp, pressure, and mode
+		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 3);
+		// Wait for the transaction to complete...
+		while ( TWI_Transceiver_Busy() );
+		//  All done - and first measurement cycle has  been kicked off!
+	}
+}
+
+void bme280basic_bulk_data_read(void) {
+	// Routine to do a block read of the temperature, pressure, and humidity registers on the BME280
+	// See the bme280basic_init routine for the read and write protocols for using this sensor...
+	uint8_t i;
+	static volatile uint8_t BMEbusy;
+	//
+	// Ensure the device has completed the read cycle...
+	BMEbusy = 1;
+	while (BMEbusy) {
+		BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+		BMEmessageBuf[1] = 0xF3; // The BME280 status register
+		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2);
+		// Let initialization transaction complete...
+		while ( TWI_Transceiver_Busy() );
+		// Bytes to read = (number_of_bytes_to_read (on next cycle) +1). 
+		BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
+		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2); //We want one bytes back, so use 2 in the function call.
+		// Let initialization transaction complete...
+		while ( TWI_Transceiver_Busy() );
+		// Copy the data we want...
+		TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 2);
+		// CHeck to see if things are still busy
+		BMEbusy = ((0b00001000 & BMEmessageBuf[1])>>3);
+	}
+	//
+	// Device is completed the measurement cycle, now get the temperature data...
+	// We want to start reading the data from register 0xF7 and read to register 0xFE - 8 bytes total
+	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+	BMEmessageBuf[1] = 0xF7; // The register we want to start reading from 
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2);
+	// Let initialization transaction complete...
+	while ( TWI_Transceiver_Busy() );
+	// Now for the read part...
+	// Bytes to read = (number_of_bytes_to_read (on next cycle) +1). Zero origin.   If we want to read eight bytes, we pass "9".
+	BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 9); //We want eight bytes back, so use 9 in the function call.
+	// Let initialization transaction complete...
+	while ( TWI_Transceiver_Busy() );
+	// Now get the data we just read...note this call just copies the data from the TWI routine buffer to our local buffer (BMEmessageBuf)...
+	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 9);
+	// Note that the data we want starts in BMEmessageBuf[1], not BMEmessageBuf[0]
+	// Transfer the data to a variable we can manipulate to get our data out...
+	for (i=0;i<8;i++) 	{
+		RawBMEdata[i] = BMEmessageBuf[i+1];
+	}
+	rawPress = ((uint32_t)RawBMEdata[0]<<12) | ((uint32_t)RawBMEdata[1]<<4) | ((uint32_t)RawBMEdata[2]>>4);
+	rawTemp = ((uint32_t)RawBMEdata[3]<<12) | ((uint32_t)RawBMEdata[4]<<4) | ((uint32_t)RawBMEdata[5]>>4);
+	rawHum = ((uint32_t)RawBMEdata[6]<<8) | (uint32_t)RawBMEdata[7];
+	//
+	BMEmessageBuf[0] = 0xFF; //Here for a breakpoint when debugging.  Remove.
+	// Now kick off the measurement cycle for the next read...
+	// We want Temperature oversampling set to x1 (ctrl_meas (0xF4) [7:5] = 0b001)
+	// We want Pressure oversampling set to x8 (ctrl_meas (0xF4) [4:2] = 0b100)
+	// Put the device into Forced mode (we want to tell the device to "go measure") (ctrl_meas (0xF4) [1:0] = 0b01)
+	// BMEtriggerbyte ^= 0x03; // toggle the forced mode (not sure this is required)
+	// NOTE: THIS BYTE MUST BE RESENT EACH TIME TO GET A NEW MEASUREMENT
+	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+	BMEmessageBuf[1] = 0xF4; // The register we want to write to
+	BMEmessageBuf[2] = (0b01<<5) | (0b100<<2) | (0b01<<0); // Set temp, pressure, and mode
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 3);
+	// Wait for the transaction to complete...
+	while ( TWI_Transceiver_Busy() );
+	//  All done - and the next measurement cycle has  been kicked off!
+}
+
+// Returns temperature in DegC, resolution is 0.01 DegC. Output value of “5123” equals 51.23 Deg C.
+// t_fine carries fine temperature as global value
+long BME280_compensate_T_int32(long adc_T) {
+	long var1, var2, T;
+	var1  = ((((adc_T>>3) - (dig_T1<<1))) * (dig_T2)) >> 11;
+	var2  = (((((adc_T>>4) - (dig_T1)) * ((adc_T>>4) - (dig_T1))) >> 12) * (dig_T3)) >> 14;
+	t_fine = var1 + var2;
+	T  = (t_fine * 5 + 128) >> 8;
+	return T;
+}*/
 
 /********************************************************************************
 						Main
@@ -76,11 +282,13 @@ int main(void)
  	// initialize the gas sensors
 	gas_sensors_init();
 	// 
+	// Check the BME interface...
+	//bme280basic_init();
 	// Start all interrupts
 	sei();
 	//
 	// Initialize the pressure / temperature /  humidity sensor
-	// BME280_init(); 
+	// bme280_structure_and_device_init(); 
 	//
 	// Now that we've tried to initialize everything, we need to report status to the three LEDs sitting on
 	// the circuit board...the current placeholder routine does not do this so well.  Need to rethink this.
@@ -162,6 +370,9 @@ int main(void)
  			printf("\nOzone = %u\n", raw_gas_vector[4]);
 			//============================
 			//
+			// Now test the BME interface...
+			//bme280basic_bulk_data_read();
+			//tempCelsius = BME280_compensate_T_int32(rawTemp);
 			// That completes the sensor sweep		
 		} else {
 		}

@@ -70,6 +70,9 @@
 #define CH4_sensor_error 6
 #define O3_sensor_error 7
 
+#define BME_WRITE_ADDRESS dev_id << 1
+#define BME_READ_ADDRESS dev_id << 1 | 1
+
 /********************************************************************************
 						Global Variables
 ********************************************************************************/

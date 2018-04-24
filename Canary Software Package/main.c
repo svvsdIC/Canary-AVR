@@ -15,14 +15,17 @@
 						Includes
 ********************************************************************************/
 #include "canary_common.h" // Contains all Canary Project global definitions
+//#include "BME280.h"
 #include <avr/io.h>		// Contains the standard IO definitions
-#include "BME280.h"
-#include "bme280_defs.h"
 
 /********************************************************************************
 						Macros and Defines
 ********************************************************************************/
+#define BME280_ADDRESS                (0x76)
+#define BME_WRITE_ADDRESS	(BME280_ADDRESS<<1)
+#define BME_READ_ADDRESS	((BME280_ADDRESS<<1)|1)
 
+volatile uint16_t temp1;
 
 /********************************************************************************
 						Global Variables
@@ -31,7 +34,6 @@
 volatile uint16_t seconds; 
 uint8_t BMEtriggerbyte; //, debugdata;
 long rawPress, rawTemp, rawHum, t_fine, tempCelsius;
-char messageWant [UART1_RX_BUFFER_SIZE];
 // Correction parameters for Temperature
 uint16_t dig_T1;
 short dig_T2, dig_T3;
@@ -51,6 +53,7 @@ unsigned char BMEmessageBuf[TWI_BUFFER_SIZE], RawBMEdata[8];
 /********************************************************************************
 						Functions
 ********************************************************************************/
+
 // void bme280_structure_and_device_init(void) {
 // 	dev.dev_id = BME280_I2C_ADDR_PRIM;
 // 	dev.intf = BME280_I2C_INTF;
@@ -59,11 +62,12 @@ unsigned char BMEmessageBuf[TWI_BUFFER_SIZE], RawBMEdata[8];
 // 	dev.delay_ms = user_delay_ms;
 // 	// Call the HW initialization routine
 // 	rslt = bme280_init(&dev);
+// 	
 // }
 
 void BME_read_correction_coefficients(void) {
 	// This routine (will) reads the corrective coefficients for temperature, pressure, and humidity...
-	static uint8_t i;
+	/* static uint8_t i;
 	// Just reading temperature for now...
 	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
 	BMEmessageBuf[1] = 0x88; // The register we want to start reading from
@@ -83,13 +87,13 @@ void BME_read_correction_coefficients(void) {
 	for (i=0;i<6;i++) 	{
 		RawBMEdata[i] = BMEmessageBuf[i+1];
 	}
-	dig_T1 = RawBMEdata[0] | (RawBMEdata[1]<<8); //0x7069;
-	dig_T2 = RawBMEdata[2] | (RawBMEdata[3]<<8); //0x6738;
-	dig_T3 = RawBMEdata[4] | (RawBMEdata[5]<<8); //0x32;
+*/	dig_T1 = 0x7069; //RawBMEdata[0] | (RawBMEdata[1]<<8);
+	dig_T2 = 0x6738; //RawBMEdata[2] | (RawBMEdata[3]<<8);
+	dig_T3 = 0x32; //RawBMEdata[4] | (RawBMEdata[5]<<8);
 }
 
 
-/*void bme280basic_init(void) {
+void bme280basic_init(void) {
 	// This routine resets the BME280 then checks the chip ID to see if it is the right device.
 	//
 	// Process for writing data to registers for the BME280:
@@ -239,7 +243,7 @@ long BME280_compensate_T_int32(long adc_T) {
 	t_fine = var1 + var2;
 	T  = (t_fine * 5 + 128) >> 8;
 	return T;
-}*/
+}
 
 /********************************************************************************
 						Main
@@ -254,15 +258,11 @@ int main(void)
 	// Set the I/O pins
 	canary_io_pin_initialization();
 	//
-	// Set a simple counter for the loop below.  Debug only.
-	seconds=0;
-	ItsTime=0;
-	//
-	// set up our output for handling printf and string operations,,,
-	stdout = &mystdout0;
-	//
 	// Initialize the timer counter 1 for 1Hz interrupt
 	initialize_timer_counter_1();
+	//
+	// set up our output for handling printf and string operations,,,
+	stdout = &mystdout;
 	//
 	// Initialize timer counter 0 for 100Hz interrupt (used for SD card debug only)
 	// initialize_timer_counter_0();  // ONLY ENABLE if using SD card
@@ -270,25 +270,30 @@ int main(void)
 	// Initialize our main communication to the ground (UART0)
 	USART0_init(MYUBRR0);
 	//
-	// Initialize the GPS module interface handler
-	USART1_init(MYUBRR1);
-	//
 	// Initialize the TWI peripheral
 	TWI_Master_Initialise();
 	//
-	// Initialize the Analog to digital hardware - and test the I/F.
-	ADC_init();
-	//
- 	// initialize the gas sensors
-	gas_sensors_init();
-	// 
-	// Check the BME interface...
-	//bme280basic_init();
 	// Start all interrupts
 	sei();
+	// Initialize the Analog to digital hardware - and test the I/F.
+//	ADC_init();
 	//
+	// FOR DEBUG ONLY: Initialize the RGB sensor - Craig uses this to ensure I2C is working
+//	RGBsensor_init();
+	//
+	// Check the BME interface...
+	bme280basic_init();
+	//
+ 	// initialize the gas sensors
+//	gas_sensors_init();
+	// 
+	//
+	// Create an instance of bme280_dev to initialize the BME280
 	// Initialize the pressure / temperature /  humidity sensor
-	// bme280_structure_and_device_init(); 
+/*	bme280_structure_and_device_init();*/
+	//
+	// Initialize the GPS module
+	// USART1_init(MYBURR1);
 	//
 	// Now that we've tried to initialize everything, we need to report status to the three LEDs sitting on
 	// the circuit board...the current placeholder routine does not do this so well.  Need to rethink this.
@@ -305,8 +310,7 @@ int main(void)
  	// *************************************************************************
  	// main loop
  	// *************************************************************************
-    printf("Starting main loop.");
-	while (1) 
+    while (1) 
     {
 		///////////////////////////////////////////////////////////
 		// These next few lines are for debug.  Uncomment the USART0_Trans..
@@ -314,26 +318,22 @@ int main(void)
 		// Echo the received character:  with a terminal window open on your PC,
 		// you should see everything you type echoed back to the terminal window
 		// USART0_TransmitByte(USART0_ReceiveByte());
-		//////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////
+		//
 		// reached steady state...do nothing for the moment - wait for interrupts.
 		// The variable ItsTime gets set to 1 every second...
-		
 		if (ItsTime == 1){ //wait for our 1Hz flag
 			ItsTime = 0; 
 			seconds++;
-			printf("\nSeconds = %u \n", seconds);
+			printf("\nSeconds = %u", seconds);
+//			sprintf(String, "\nSeconds = %u", seconds);
+//			USART0_putstring(String);
 			// The next several lines sweep through ALL of the attached sensors and sends the data out the serial port.
 			// It is VERY simple at present:
 			// - do a blocking read of the sensor
 			// - Send the data over the serial port
 			// - go to the next sensor 
 			// ....
-			//GPS Message
-			//USART0_putstring(&messageWant[0]);
-			for (uint8_t i = 0; i<= 50; i++) // The next few lines are commented out and can be deleted once the line above is tested.
-			{
-				USART0_TransmitByte(messageWant[i]);
-			}
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
 			//   2. Kick off the gas sensor reads - and go back for the results in a few milliseconds.  
@@ -352,27 +352,46 @@ int main(void)
 			// don't want to use when debugging the code you are adding... 
 			//
 			//============================
+			// Craig's test of the I2C interface:
+//   			TWI_XFER_STATUS = read_RGB_values();
+//  			printf(String, "\nraw clear = %u", raw_clear);
+// 			printf("\nraw red   = %u", raw_red);
+// 			printf("\nraw green = %u", raw_green);
+// 			printf("\nraw blue  = %u", raw_blue);
+// 			printf("\n=================");
+			//============================
+			//
+			//============================
 			// Now test reading the LIDAR interface
-			distance = LIDAR_distance();
-			printf("\nLIDAR distance = %u", distance);
+// 			distance = LIDAR_distance();
+// 			printf("\nLIDAR distance = %u", distance);
+			//GPSRun();
+			//============================
+			//
+			//============================
+			// Read the GPS unit;
+			// Davita has this routine specified in the notebook.
 			//============================
 			//
 			//============================
 			// Now test the gas sensor interface...
-			start_gas_sensor_read();
+//			start_gas_sensor_read();
 			// Note that this is a blocking read (stops all other activity)
 			// At present, the print statements are in that routine....
 			//...but the routine needs to be redesigned to operate in the background
- 			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
- 			printf("\nHydrogen = %u", raw_gas_vector[1]);
- 			printf("\nAmmonia = %u", raw_gas_vector[2]);
- 			printf("\nMethane = %u", raw_gas_vector[3]);
- 			printf("\nOzone = %u\n", raw_gas_vector[4]);
+// 			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
+// 			printf("\nHydrogen = %u", raw_gas_vector[1]);
+// 			printf("\nAmmonia = %u", raw_gas_vector[2]);
+// 			printf("\nMethane = %u", raw_gas_vector[3]);
+// 			printf("\nOzone = %u\n", raw_gas_vector[4]);
 			//============================
 			//
+			//============================
 			// Now test the BME interface...
-			//bme280basic_bulk_data_read();
-			//tempCelsius = BME280_compensate_T_int32(rawTemp);
+			bme280basic_bulk_data_read();
+			tempCelsius = BME280_compensate_T_int32(rawTemp);
+			//============================
+			//
 			// That completes the sensor sweep		
 		} else {
 		}

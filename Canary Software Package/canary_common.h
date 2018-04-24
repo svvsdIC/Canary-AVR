@@ -8,11 +8,6 @@
 #define CANARY_COMMON_H_
 
 /********************************************************************************
-    Define CPU frequency before the includes to avoid definition errors...
-********************************************************************************/
-// #define F_CPU 20000000UL  //NOW DEFINED IN COMPILER SYMBOLS
-
-/********************************************************************************
 						Includes
 ********************************************************************************/
 #include <avr/io.h>		// Contains the standard IO definitions
@@ -31,6 +26,7 @@
 #include "TWI_Master.h"   // I2C routines and initialization
 #include "RGBsensor.h"  // Not needed for production - here to test I2C
 #include "LIDAR.h"	//LIDAR specific routines
+#include "BME280.h" //BME280 library from Bosch
 
 // ************** The following are needed for the file system and MicroSD card
 //#include <avr/pgmspace.h>
@@ -70,17 +66,13 @@
 #define CH4_sensor_error 6
 #define O3_sensor_error 7
 
-#define BME_WRITE_ADDRESS dev_id << 1
-#define BME_READ_ADDRESS dev_id << 1 | 1
-
 /********************************************************************************
 						Global Variables
 ********************************************************************************/
 // This variable starts the data collection loop in main
-volatile uint8_t ItsTime;
-// This next line opens a virtual file that writes to the serial port
-// static FILE mystdout1 = FDEV_SETUP_STREAM(USART1_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
-static FILE mystdout0 = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
+// extern volatile uint8_t ItsTime;
+
+
 /********************************************************************************
 						Function Prototypes
 ********************************************************************************/

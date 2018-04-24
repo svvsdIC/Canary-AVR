@@ -1310,14 +1310,17 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
 		for(i = 0; i < len; i++)
 		{
 			BMEmessageBuf[i + 2] = reg_data[i];
-		}
+		}	
 	}
 	
 	// Write to the TWI interface
 	TWI_Start_Transceiver_With_Data(&BMEmessageBuf[0], len + 2);
 	
 	// Let the transfer complete
-	while(TWI_Transceiver_Busy());
+	while(TWI_Transceiver_Busy())
+	{
+		// Wait
+	}
 	
 	// If something bad has happened, rslt = 1
 	
@@ -1326,13 +1329,14 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
 
 int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
 {
+
 	int8_t rslt = 0;
 	int8_t i = 0;
 	
 	// Write device address (for writing)
 	BMEmessageBuf[0] = dev_id << 1; // Device ID is 0x76 if SDO is connected to ground and 0x77 if SDO is connected to VDDIO
 	
-	// Write the register address from which we want to start reading
+	// Write the register address from which we want to start reading 
 	BMEmessageBuf[1] = reg_addr;
 	
 	// Send the ID and register data out onto the TWI bus...
@@ -1344,10 +1348,10 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
 		// Wait
 	}
 	
-	// Now go tell the device to send the data (set the read bit)...
+	// Now go tell the device to send the data (set the read bit)... 
 	BMEmessageBuf[0] = (dev_id << 1) | 1; // Now we want to do the read
 	
-	TWI_Start_Transceiver_With_Data(&BMEmessageBuf[0], 1);
+	TWI_Start_Transceiver_With_Data(&BMEmessageBuf[0], 1); 
 	
 	// And wait for the transaction to complete...
 	while(TWI_Transceiver_Busy())
@@ -1357,12 +1361,12 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
 	
 	// Data is received, now go get it from the AVR TWI data structure...
 	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(&BMEmessageBuf[0], len);
-	
-	// The data is now in our own BMEmessageBuf.  IF WE NEED TO, copy it to another variable
+	 
+	// The data is now in our own BMEmessageBuf.  IF WE NEED TO, copy it to another variable 
 	// before it gets overwritten by another exchange...
 	for (i = 0; i < len; i++)
 	{
-		BME_data[i] = BMEmessageBuf[i];
+		 BME_data[i] = BMEmessageBuf[i];
 	}
 	
 	// If something bad has happened, rslt = 1

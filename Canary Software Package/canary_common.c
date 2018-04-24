@@ -70,4 +70,32 @@ void canary_io_pin_initialization(void) {
 	SetBit(DDRC, PORTC1); // Data Line as output
 	SetBit(PORTC, PORTC0); //Set pull-up resistor for clock
 	SetBit(PORTC, PORTC1); //Set pull-up resistor for data
+	//
+	// For the SPI interface to the uSD card, set MISO as input (with pull-up) and the rest as output:
+	SetBit(DDRB, PORTB4); //Chip Select is output
+	SetBit(DDRB, PORTB5); //MOSI is output
+	ClearBit(DDRB, PORTB6); //MISO is input
+	SetBit(PORTB, PORTB6); //Set pull-up resistor for MISO
+	SetBit(DDRB, PORTB7); //SPI clock is output
+	ClearBit(DDRC, PORTC7); //Chip Detect is an input
+	SetBit(PORTC, PORTC7); //Set pull-up resistor for Chip Detect	
+	//
+	// For the UART, use the pull-up resistors for the RX lines and set the TX lines as output
+	SetBit(DDRD, PORTD1); //TX for USART0 is an output to the XBee
+	SetBit(DDRD, PORTD3); //TX for USART1 is an output to the GPS (not used operationally)
+	ClearBit(PORTD, PORTD0); // Set the GPS Tx pin low.
+	ClearBit(DDRD, PORTD0); //RX for USART0 is an input from the XBee (not used operationally)
+	SetBit(PORTD, PORTD0); //Set pull-up resistor for USART0 Rx
+	ClearBit(DDRD, PORTD2); //RX for USART1 is an input from the GPS
+	SetBit(PORTD, PORTD2); //Set pull-up resistor for USART1 Rx
+	//
+	// Port D pins 4-7 are not used.  Set the pull-up resistors on those pins to prevent issues...
+	PORTD |= 0b11110000;
+	//
+	// All port A pins are set up as inputs.  Pin A6 is not connected, so should enable the pull-up resistor
+	SetBit(PORTA, PORTA6);
+	//
+	// JTAG pins are set automagically
+	//	
+	
 }

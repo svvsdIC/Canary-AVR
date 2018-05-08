@@ -479,9 +479,9 @@ int main(void)
 			// That completes the sensor sweep
 			bme280basic_bulk_data_read();
 			tempCelsius = BME280_compensate_T_int32(rawTemp);
- 			printf("\nCelsius = %u\n", tempCelsius);
+ 			printf("\nCelsius = %lu\n", tempCelsius);
 			pressure = BME280_compensate_P_int64(rawPress);
-			printf("\nPressure in Pa = %u\n", pressure);
+			printf("\nPressure in Pa = %lu\n", pressure);
 		} else {
 		}
     }	

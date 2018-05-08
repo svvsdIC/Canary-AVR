@@ -15,7 +15,6 @@
 						Includes
 ********************************************************************************/
 #include "UART1.h"
-#include "UART0.h" // remove once this is debugged
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdio.h>
@@ -126,8 +125,7 @@ ISR(USART1_RX_vect)
 {
 	unsigned char data;
 	unsigned char tmphead;
-	uint8_t i;
-	
+	unsigned char i;
 	// Read the received data 
 	data = UDR1;
 	// Calculate buffer index 
@@ -140,18 +138,20 @@ ISR(USART1_RX_vect)
 	}
 	// Store received data in buffer 
 	UART1_RxBuf[tmphead] = data;
-
-	if (data == 10) //See if it is the end of a GPS message...
+	
+	if (data == 10)
 	{
-		if (UART1_RxBuf[5] == 'L')  // Then if the 6th element is an L, this is the message we want to capture
+		//USART0_TransmitByte('n');
+		if (UART1_RxBuf[5] == 'L')
 		{
-			for (i = 0; i<= tmphead; i++) // Copy the full GLL message.
+			//USART0_TransmitByte(UART1_RxBuf[5]);
+			for (i = 0; i<= tmphead; i++)
 			{
 				messageWant[i] = UART1_RxBuf[i];
+
 			}
-			messageWant[i+1]=0x00; //Add a null character at the end so we can treat this like a string variable
+			messageWant[i+1]=0x00;
 		}
-		// Zero the receive buffer so it is ready for the next message format.
 		UART1_RxTail = 0;
 		UART1_RxHead = 0;
 	}

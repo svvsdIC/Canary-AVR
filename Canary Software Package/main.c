@@ -36,7 +36,7 @@ char String[]="Hello World!! The serial port is working!";
 extern char messageWant [UART1_RX_BUFFER_SIZE];
 volatile uint16_t seconds;
 uint8_t BMEtriggerbyte; //, debugdata;
-long rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure;
+long rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, temperature;
 /*long var1, var2, p;*/
 // Correction parameters for Temperature
 uint16_t dig_T1;
@@ -44,12 +44,15 @@ short dig_T2, dig_T3;
 // Correction parameters for Pressure
 uint16_t dig_P1;
 short dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
+// correction paramters for humidity
+uint16_t dig_H1, dig_H3;
+short dig_H2, dig_H4, dig_H5, dig_H6;
 // This variable starts the data collection loop in main
 extern volatile uint8_t ItsTime;
 // This next line opens a virtual file that writes to the serial port
 static FILE mystdout = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
 // To test basic functionality of the BME280...
-unsigned char BMEmessageBuf[TWI_BUFFER_SIZE], RawBMEdata[26];
+unsigned char BMEmessageBuf[TWI_BUFFER_SIZE], RawBMEdata[40];
 /********************************************************************************
 						Functions
 ********************************************************************************/
@@ -110,14 +113,14 @@ void BME_read_correction_coefficients(void) {
 	// Now for the read part...
 	// Bytes to read = (number_of_bytes_to_read (on next cycle) +1). Zero origin.   If we want to read eight bytes, we pass "9".
 	BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
-	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 26); //We want eight bytes back, so use 9 in the function call.
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 27); //We want eight bytes back, so use 9 in the function call.
 	// Let initialization transaction complete...
 	while ( TWI_Transceiver_Busy() );
 	// Now get the data we just read...note this call just copies the data from the TWI routine buffer to our local buffer (BMEmessageBuf)...
-	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 26);
+	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 27);
 	// Note that the data we want starts in BMEmessageBuf[1], not BMEmessageBuf[0]
 	// Transfer the data to a variable we can manipulate to get our data out...
-	for (i=0;i<26;i++) 	{
+	for (i=0;i<27;i++) 	{
 		RawBMEdata[i] = BMEmessageBuf[i+1];
 	}
 	dig_T1 = /*0x7069;*/ RawBMEdata[0] | (RawBMEdata[1]<<8);
@@ -132,6 +135,16 @@ void BME_read_correction_coefficients(void) {
 	dig_P7 = RawBMEdata[18] | (RawBMEdata[19]<<8);
 	dig_P8 = RawBMEdata[20] | (RawBMEdata[21]<<8);
 	dig_P9 = RawBMEdata[22] | (RawBMEdata[23]<<8);
+	dig_H1 = RawBMEdata[25];
+	BMEmessageBuf[26] = 0xE1; // The register we want to start reading from 
+	for (i=26;i<33;i++) 	{
+		RawBMEdata[i] = BMEmessageBuf[i+1];
+	}
+	dig_H2 = RawBMEdata[26] | (RawBMEdata[27]<<8); 
+	dig_H3 = RawBMEdata[28]; 
+	dig_H4 = (RawBMEdata[29]<<4) | (RawBMEdata[30]>>5);
+	dig_H5 = (RawBMEdata[31]>>5) | (RawBMEdata[32]<<4);
+	dig_H6 = RawBMEdata[33];
 }
 
 
@@ -291,13 +304,13 @@ long BME280_compensate_T_int32(long adc_T) {
 //Output value of "24674867" represents 24674867/256 = 96386.2 Pa = 963.862 hPa
 long BME280_compensate_P_int64(long adc_P)
 {
-	long var1, var2, p;
+	long long var1, var2, p;
 	var1 = ((long)t_fine)-128000;
 	var2 = var1*var1*(long)dig_P6;
 	var2 = var2 + ((var1*(long)dig_P5)<<17);
-	var2 = var2 + (((long)dig_P4)<<35);
+	var2 = var2 + (((long long)dig_P4)<<35);
 	var1 = ((var1*var1*(long)dig_P3)>>8)+((var1*(long)dig_P2)<<12);
-	var1 = (((((long)1)<<47)+var1))*((long)dig_P1)>>33;
+	var1 = (((((long long)1)<<47)+var1))*((long long)dig_P1)>>33;
 	if (var1 == 0)
 	{
 		return 0;
@@ -306,8 +319,24 @@ long BME280_compensate_P_int64(long adc_P)
 	p = (((p<<31)-var2)*3125)/var1;
 	var1 = (((long)dig_P9)*(p>>13)*(p>>13))>>25;
 	var2 = (((long)dig_P8)*p)>>19;
-	p = ((p+var1+var2)>>8)+((long)dig_P7)<<4;
+	p = ((p+var1+var2)>>8)+(((long)dig_P7)<<4);
 	return(long)p;
+}
+
+// Returns humidity in %RH as unsigned 32 bit integer in Q22.10 format (22 integer and 10 fractional bits).
+// Output value of “47445” represents 47445/1024 = 46.333 %RH
+long bme280_compensate_H_int32(long adc_H)
+{
+	long long v_x1_u32r;
+	v_x1_u32r = (t_fine - ((long long)76800));
+	v_x1_u32r = (((((adc_H << 14) - (((long long)dig_H4) << 20) - (((long long)dig_H5) * v_x1_u32r)) +
+	((long long)16384)) >> 15) * (((((((v_x1_u32r * ((long long)dig_H6)) >> 10) * (((v_x1_u32r *
+	((long long)dig_H3)) >> 11) + ((long long)32768))) >> 10) + ((long long)2097152)) *
+	((long long)dig_H2) + 8192) >> 14));
+	v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((long long)dig_H1)) >> 4));
+	v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
+	v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
+	return (long)(v_x1_u32r>>12);
 }
 /********************************************************************************
 						Main
@@ -481,7 +510,9 @@ int main(void)
 			tempCelsius = BME280_compensate_T_int32(rawTemp);
  			printf("\nCelsius = %lu\n", tempCelsius);
 			pressure = BME280_compensate_P_int64(rawPress);
-			printf("\nPressure in Pa = %lu\n", pressure);
+			printf("\nPressure in Pa = %lu\n", pressure/256);
+			temperature = bme280_compensate_H_int32(rawHum);
+			printf("\n Humidity = %lu\n", temperature);
 		} else {
 		}
     }	

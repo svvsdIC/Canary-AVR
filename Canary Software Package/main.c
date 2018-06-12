@@ -36,7 +36,7 @@ char String[]="Hello World!! The serial port is working!";
 extern char messageWant [UART1_RX_BUFFER_SIZE];
 volatile uint16_t seconds;
 uint8_t BMEtriggerbyte; //, debugdata;
-long rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, temperature;
+long rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, humidity;
 /*long var1, var2, p;*/
 // Correction parameters for Temperature
 uint16_t dig_T1;
@@ -142,8 +142,8 @@ void BME_read_correction_coefficients(void) {
 	}
 	dig_H2 = RawBMEdata[26] | (RawBMEdata[27]<<8); 
 	dig_H3 = RawBMEdata[28]; 
-	dig_H4 = (RawBMEdata[29]<<4) | (RawBMEdata[30]>>5);
-	dig_H5 = (RawBMEdata[31]>>5) | (RawBMEdata[32]<<4);
+	dig_H4 = (RawBMEdata[29]<<4) | (RawBMEdata[30]>>4);
+	dig_H5 = (RawBMEdata[31]>>4) | (RawBMEdata[32]<<4);
 	dig_H6 = RawBMEdata[33];
 }
 
@@ -511,8 +511,8 @@ int main(void)
  			printf("\nCelsius = %lu\n", tempCelsius);
 			pressure = BME280_compensate_P_int64(rawPress);
 			printf("\nPressure in Pa = %lu\n", pressure/256);
-			temperature = bme280_compensate_H_int32(rawHum);
-			printf("\n Humidity = %lu\n", temperature);
+			humidity = bme280_compensate_H_int32(rawHum);
+			printf("\n Humidity in percent relative humidity= %lu\n", humidity);
 		} else {
 		}
     }	

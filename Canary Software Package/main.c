@@ -136,15 +136,30 @@ void BME_read_correction_coefficients(void) {
 	dig_P8 = RawBMEdata[20] | (RawBMEdata[21]<<8);
 	dig_P9 = RawBMEdata[22] | (RawBMEdata[23]<<8);
 	dig_H1 = RawBMEdata[25];
-	BMEmessageBuf[26] = 0xE1; // The register we want to start reading from 
-	for (i=26;i<33;i++) 	{
+	//Now grab the rest of the humidity sensor data
+	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
+	BMEmessageBuf[1] = 0xE1; // The register we want to start reading from
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2);
+	// Let initialization transaction complete...
+	while ( TWI_Transceiver_Busy() );
+	// Now for the read part...
+	// Bytes to read = (number_of_bytes_to_read (on next cycle) +1). Zero origin.   If we want to read eight bytes, we pass "9".
+	BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 8); //We want eight bytes back, so use 9 in the function call.
+	// Let initialization transaction complete...
+	while ( TWI_Transceiver_Busy() );
+	// Now get the data we just read...note this call just copies the data from the TWI routine buffer to our local buffer (BMEmessageBuf)...
+	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 8);
+	// Note that the data we want starts in BMEmessageBuf[1], not BMEmessageBuf[0]
+	// Transfer the data to a variable we can manipulate to get our data out...
+	for (i=0;i<7;i++) 	{
 		RawBMEdata[i] = BMEmessageBuf[i+1];
 	}
-	dig_H2 = RawBMEdata[26] | (RawBMEdata[27]<<8); 
-	dig_H3 = RawBMEdata[28]; 
-	dig_H4 = (RawBMEdata[29]<<4) | (RawBMEdata[30]>>4);
-	dig_H5 = (RawBMEdata[31]>>4) | (RawBMEdata[32]<<4);
-	dig_H6 = RawBMEdata[33];
+	dig_H2 = RawBMEdata[1] | (RawBMEdata[2]<<8); 
+	dig_H3 = RawBMEdata[3]; 
+	dig_H4 = (RawBMEdata[4]<<4) | (RawBMEdata[5]>>5);
+	dig_H5 = (RawBMEdata[5]>>5) | (RawBMEdata[6]<<4);
+	dig_H6 = RawBMEdata[7];
 }
 
 
@@ -509,8 +524,8 @@ int main(void)
 			bme280basic_bulk_data_read();
 			tempCelsius = BME280_compensate_T_int32(rawTemp);
  			printf("\nCelsius = %lu\n", tempCelsius);
-			pressure = BME280_compensate_P_int64(rawPress);
-			printf("\nPressure in Pa = %lu\n", pressure/256);
+			pressure = BME280_compensate_P_int64(rawPress>>8);
+			printf("\nPressure in Pa = %lu\n", pressure);
 			humidity = bme280_compensate_H_int32(rawHum);
 			printf("\n Humidity in percent relative humidity= %lu\n", humidity);
 		} else {

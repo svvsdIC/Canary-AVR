@@ -142,7 +142,7 @@ ISR(USART1_RX_vect)
 	if (data == 10)
 	{
 		//USART0_TransmitByte('n');
-		if (UART1_RxBuf[5] == 'L')
+		if (UART1_RxBuf[5] == 'G')
 		{
 			//USART0_TransmitByte(UART1_RxBuf[5]);
 			for (i = 0; i<= tmphead; i++)

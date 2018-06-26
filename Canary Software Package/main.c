@@ -41,6 +41,7 @@ long rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, humidity;
 // Correction parameters for Temperature
 uint16_t dig_T1;
 short dig_T2, dig_T3;
+char temp [4];
 // Correction parameters for Pressure
 uint16_t dig_P1;
 short dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
@@ -448,7 +449,7 @@ int main(void)
 			// - go to the next sensor 
 			//USART0_putstring(&messageWant[0]);
 			
-			for (uint8_t i = 0; i<= 51; i++)
+			for (uint8_t i = 0; i<= 71; i++)
 			{
 				USART0_TransmitByte(messageWant[i]);
 			}
@@ -494,6 +495,16 @@ int main(void)
 			 //Now test reading the LIDAR interface
 			distance = LIDAR_distance();
 			printf("\nLIDAR distance = %u", distance);
+			printf("\n LiDAR message = http://canary.chordsrt.com/measurements/url_create?instrument_id=3&dist=%u&key=4e6fba7420ec9e881f510bcddb&", distance); //need key
+			for (uint8_t i = 8; i<= 13; i++)//adds in time
+			{
+				USART0_TransmitByte(messageWant[i]);
+				if (i%2 ==1)
+				{
+					printf(":");
+				}
+			}
+			printf("Z");
 			//============================
 			//
 			//============================
@@ -523,11 +534,18 @@ int main(void)
 			// That completes the sensor sweep
 			bme280basic_bulk_data_read();
 			tempCelsius = BME280_compensate_T_int32(rawTemp);
+			for (uint8_t i = 8; i<= 4; i++)
+			{
+				temp[i]=tempCelsius%10^(3-i);
+				tempCelsius-=10^(3-i);
+			}
+			tempCelsius = BME280_compensate_T_int32(rawTemp);
  			printf("\nCelsius = %lu\n", tempCelsius);
-			pressure = BME280_compensate_P_int64(rawPress>>8);
-			printf("\nPressure in Pa = %lu\n", pressure);
+			pressure = BME280_compensate_P_int64(rawPress);
+			printf("\nPressure in Pa = %lu\n", pressure>>8);
 			humidity = bme280_compensate_H_int32(rawHum);
-			printf("\n Humidity in percent relative humidity= %lu\n", humidity);
+			printf("\n Humidity in percent relative humidity= %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
+			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=12.34&pres=1234&hum=123&key=4e6fba7420ec9e881f510bcddb&at=2018-06-12T11:16:00Z");
 		} else {
 		}
     }	

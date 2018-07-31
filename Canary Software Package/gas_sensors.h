@@ -32,6 +32,7 @@
 /********************************************************************************
 						Global Variables
 ********************************************************************************/
+volatile uint8_t R0; //Keeps track of the voltage of the current sensor
 volatile uint8_t gas_sensor_id;  // Keeps track of the current sensor being measured
 volatile uint8_t gas_sample_count;  // Defines how many samples we've collected so far
 volatile uint16_t gas_average;  // variable to hold the current sensor's average reading

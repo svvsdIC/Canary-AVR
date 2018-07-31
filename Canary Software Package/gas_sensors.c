@@ -117,3 +117,20 @@ void start_gas_sensor_read(void)
 		raw_gas_vector[sensor_id] = gas_average;
 	}
 }
+
+uint16_t calibrateSensor(sensor_id)
+{
+	//Take the smallest R1/R0 value and the largest R1/R0 value from the original set of data points
+	//Multiply them by a number that is a power of two (so that the values are large enough to divide by 64 later)
+	//Round the two values to the nearest integer value
+	//Divide the values by 64
+	//Now you should have a table of 64 values ranging from the original smallest value to the original largest value
+	//Divide each of the 64 values by the number that is a power of two
+	//Create a lookup table for the values, this will create a list of approx. ppm values
+	//Manually enter in new equation to calculate the actual ppm
+	
+	//Per sensor - make look-up table w/ values corresponding to out put. 
+	//Get approx ppm
+	//write equation
+
+}

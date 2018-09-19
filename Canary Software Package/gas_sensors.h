@@ -55,5 +55,6 @@ void get_gas_sensor_limits(void);
 void get_gas_sensor_limits_from_EEPROM(void);
 void gas_sensors_init(void);
 void start_gas_sensor_read(void);
+uint16_t convert_to_ppm(uint8_t sensor_id);
 
 #endif /* GAS_SENSORS_H_ */

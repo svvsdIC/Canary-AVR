@@ -18,6 +18,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdio.h>
+#include "canary_common.h"
 
 /********************************************************************************
 						Global Variables
@@ -30,6 +31,7 @@ static volatile unsigned char UART1_TxHead;
 static volatile unsigned char UART1_TxTail;
 unsigned char UART1_RxBuf [UART1_RX_BUFFER_SIZE];
 char messageWant [UART1_RX_BUFFER_SIZE];
+extern volatile uint8_t ItsTime;
 
 /********************************************************************************
 *********************************************************************************
@@ -151,6 +153,9 @@ ISR(USART1_RX_vect)
 
 			}
 			messageWant[i+1]=0x00;
+			UCSR1B &= !(1<<RXEN1);  //Clear the receive interrupt on USART 1 until we're done reading all other sensors.
+			ItsTime = 1;
+			ToggleBit(PORTB, PORTB1);
 		}
 		UART1_RxTail = 0;
 		UART1_RxHead = 0;

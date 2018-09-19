@@ -89,8 +89,8 @@ ISR(TIMER0_COMPA_vect)
 */
 
 
-ISR(TIMER1_COMPA_vect)
-{
-	ToggleBit(PORTB, PORTB1); //for now, just toggle the green status LED
-	ItsTime = 1;
-}
+// ISR(TIMER1_COMPA_vect)
+// {
+// 	ToggleBit(PORTB, PORTB1); //for now, just toggle the green status LED
+// 	ItsTime = 1;
+// }

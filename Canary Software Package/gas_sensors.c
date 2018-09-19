@@ -118,7 +118,7 @@ void start_gas_sensor_read(void)
 	}
 }
 
-uint16_t calibrateSensor(sensor_id)
+uint16_t convert_to_ppm(uint8_t sensor_id)
 {
 	//Take the smallest R1/R0 value and the largest R1/R0 value from the original set of data points
 	//Multiply them by a number that is a power of two (so that the values are large enough to divide by 64 later)

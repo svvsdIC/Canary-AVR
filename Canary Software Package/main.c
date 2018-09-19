@@ -42,6 +42,7 @@ long rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, humidity;
 uint16_t dig_T1;
 short dig_T2, dig_T3;
 char temperatureBuf [4];
+char time [6];
 // Correction parameters for Pressure
 uint16_t dig_P1;
 short dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
@@ -453,17 +454,6 @@ int main(void)
 			{
 				USART0_TransmitByte(messageWant[i]);
 			}
-			//GPS Message
-			/*
-			printf("time:");
-			for (uint8_t i = 31; i<= 41; i++)
-			{
-				USART0_TransmitByte(messageWant[i]);
-				if(i%2 == 0)
-				{
-					printf(":");
-				}
-			}*/
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
 			//   2. Kick off the gas sensor reads - and go back for the results in a few milliseconds.  
@@ -499,6 +489,7 @@ int main(void)
 			for (uint8_t i = 8; i<= 13; i++)//adds in time
 			{
 				USART0_TransmitByte(messageWant[i]);
+				time[i] = messageWant[i];
 				if (i%2 ==1)
 				{
 					printf(":");
@@ -533,14 +524,14 @@ int main(void)
 			//
 			// That completes the sensor sweep
 			bme280basic_bulk_data_read();
-			tempCelsius = BME280_compensate_T_int32(rawTemp);
-			sprintf(temperatureBuf, "%lu", tempCelsius);
- 			printf("\nCelsius = %lu\n", tempCelsius);
-			pressure = BME280_compensate_P_int64(rawPress);
-			printf("\nPressure in Pa = %lu\n", pressure>>8);
-			humidity = bme280_compensate_H_int32(rawHum);
-			printf("\n Humidity in percent relative humidity= %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
-			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb", temp, temp+2, pressure, humidity); //need key
+			tempCelsius = BME280_compensate_T_int32(rawTemp);
+			sprintf(temperatureBuf, "%lu", tempCelsius);
+ 			printf("\nCelsius = %lu\n", tempCelsius);
+			pressure = BME280_compensate_P_int64(rawPress);
+			printf("\nPressure in Pa = %lu\n", pressure>>8);
+			humidity = bme280_compensate_H_int32(rawHum);
+			printf("\n Humidity in percent relative humidity= %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
+			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb%.3s:%.4s:%.3s", temp, temp+2, pressure, humidity, time, time+2, time+4); //need key						UCSR1B |= (1<<RXEN1); 
 		} else {
 		}
     }	

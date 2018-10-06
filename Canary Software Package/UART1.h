@@ -43,7 +43,7 @@
 /********************************************************************************
 						Function Prototypes
 ********************************************************************************/
-;void USART1_init(uint16_t ubrr_val);
+void USART1_init(uint16_t ubrr_val);
 unsigned char USART1_ReceiveByte(void);
 void USART1_TransmitByte(unsigned char data);
 void USART1_putstring(char* StringPtr);

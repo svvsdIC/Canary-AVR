@@ -15,7 +15,7 @@
 						Includes
 ********************************************************************************/
 #include "UART1.h"
-#include "UART0.h" // remove once this is debugged
+#include "canary_common.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdio.h>
@@ -31,6 +31,7 @@ static volatile unsigned char UART1_TxHead;
 static volatile unsigned char UART1_TxTail;
 unsigned char UART1_RxBuf [UART1_RX_BUFFER_SIZE];
 char messageWant [UART1_RX_BUFFER_SIZE];
+extern volatile uint8_t ItsTime;
 
 /********************************************************************************
 *********************************************************************************
@@ -46,8 +47,9 @@ void USART1_init(uint16_t ubrr_val)
 	// Set baud rate register
 	UBRR1H = (unsigned char)(ubrr_val>>8);
 	UBRR1L = (unsigned char) ubrr_val;
-	// Enable UART1 receiver, transmitter, and the receive complete interrupt
-	UCSR1B = ((1<<RXEN1) | (1<<TXEN1) | (1<<RXCIE1));
+	// For the GPS sensor, enable the UART1 receiver hardware 
+	// and the receive complete interrupt only.  The GPS sensor is receive only.
+	UCSR1B = ((1<<RXEN1) | (1<<RXCIE1));
 	// Set UART mode and frame format: 8 data, 1 stop bits, no parity
 	UCSR1C = (3<<UCSZ10);
 	//
@@ -126,8 +128,7 @@ ISR(USART1_RX_vect)
 {
 	unsigned char data;
 	unsigned char tmphead;
-	uint8_t i;
-	
+	unsigned char i;
 	// Read the received data 
 	data = UDR1;
 	// Calculate buffer index 
@@ -140,36 +141,42 @@ ISR(USART1_RX_vect)
 	}
 	// Store received data in buffer 
 	UART1_RxBuf[tmphead] = data;
-
-	if (data == 10) //See if it is the end of a GPS message...
+	
+	if (data == 10)
 	{
-		if (UART1_RxBuf[5] == 'L')  // Then if the 6th element is an L, this is the message we want to capture
+		//USART0_TransmitByte('n');
+		if (UART1_RxBuf[5] == 'G')
 		{
-			for (i = 0; i<= tmphead; i++) // Copy the full GLL message.
+			//USART0_TransmitByte(UART1_RxBuf[5]);
+			for (i = 0; i<= tmphead; i++)
 			{
 				messageWant[i] = UART1_RxBuf[i];
+
 			}
-			messageWant[i+1]=0x00; //Add a null character at the end so we can treat this like a string variable
+			messageWant[i+1]=0x00;
+// 			UCSR1B &= !(1<<RXCIE1);  //Clear the receive interrupt on USART 1 until we're done reading all other sensors.
+ 			ItsTime = 1;
+ 			ToggleBit(PORTB, PORTB1);
 		}
-		// Zero the receive buffer so it is ready for the next message format.
 		UART1_RxTail = 0;
 		UART1_RxHead = 0;
 	}
 }
 
-ISR(USART1_UDRE_vect)
-{
-	unsigned char tmptail;
-	// Check if all data is transmitted 
-	if (UART1_TxHead != UART1_TxTail) {
-		// Calculate buffer index
-		tmptail = ( UART1_TxTail + 1 ) & UART1_TX_BUFFER_MASK;
-		// Store new index 
-		UART1_TxTail = tmptail;
-		// Start transmission 
-		UDR1 = UART1_TxBuf[tmptail];
-		} else {
-		// Disable UDRE interrupt 
-		UCSR1B &= ~(1<<UDRIE1);
-	}
-}
+// The transmit data register empty interrupt is not needed, as we never send things to the GPS sensor.
+//  ISR(USART1_UDRE_vect)
+// {
+// 	unsigned char tmptail;
+// 	// Check if all data is transmitted 
+// 	if (UART1_TxHead != UART1_TxTail) {
+// 		// Calculate buffer index
+// 		tmptail = ( UART1_TxTail + 1 ) & UART1_TX_BUFFER_MASK;
+// 		// Store new index 
+// 		UART1_TxTail = tmptail;
+// 		// Start transmission 
+// 		UDR1 = UART1_TxBuf[tmptail];
+// 		} else {
+// 		// Disable UDRE interrupt 
+// 		UCSR1B &= ~(1<<UDRIE1);
+// 	}
+// }

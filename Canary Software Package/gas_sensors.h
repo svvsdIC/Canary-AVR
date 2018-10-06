@@ -27,11 +27,12 @@
 #define NH3 2
 #define CH4 3
 #define O3 4
-#define max_gas_sample_count 4 // How many samples get averaged into one report
+#define max_gas_sample_count 4 // How many samples get averaged into one report; use factor of two
 
 /********************************************************************************
 						Global Variables
 ********************************************************************************/
+volatile uint8_t R0; //Keeps track of the voltage of the current sensor
 volatile uint8_t gas_sensor_id;  // Keeps track of the current sensor being measured
 volatile uint8_t gas_sample_count;  // Defines how many samples we've collected so far
 volatile uint16_t gas_average;  // variable to hold the current sensor's average reading
@@ -54,5 +55,6 @@ void get_gas_sensor_limits(void);
 void get_gas_sensor_limits_from_EEPROM(void);
 void gas_sensors_init(void);
 void start_gas_sensor_read(void);
+uint16_t convert_to_ppm(uint8_t sensor_id);
 
 #endif /* GAS_SENSORS_H_ */

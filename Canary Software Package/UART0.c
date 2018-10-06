@@ -2,8 +2,8 @@
  * UART0.c
  *
  * This set of functions implements an interrupt driven UART interface on
- * UART0 in an Atmel atmega324PA.  It has been tested @4800 baud, 8 data bits,
- * 2 stop bits, no parity, and no flow control on a chip with no external
+ * UART0 in an Atmel atmega324PA.  It has been tested @9600 baud, 8 data bits,
+ * 1 stop bits, no parity, and no flow control on a chip with no external
  * crystal.  It should run much faster with a better clock source.
  * Based on Atmel's series "Getting Started with AVR" on Youtube.
  *
@@ -43,10 +43,10 @@ void USART0_init(uint16_t ubrr_val)
 	// Set baud rate register
 	UBRR0H = (unsigned char)(ubrr_val>>8);
 	UBRR0L = (unsigned char) ubrr_val;
-	// Enable UART0 receiver, transmitter, and the receive complete interrupt
-	UCSR0B = ((1<<RXEN0) | (1<<TXEN0) | (1<<RXCIE0));
-	// Set UART mode and frame format: 8 data, 2 stop bits, no parity
-	UCSR0C = (3<<UCSZ00) | (1<<USBS0);	
+	// Enable UART0  transmitter, since we only send on this interface
+	UCSR0B = (1<<TXEN0);  // UCSR0B = ((1<<RXEN0) | (1<<TXEN0) | (1<<RXCIE0));
+	// Set UART mode and frame format: 8 data, 1 stop bit, no parity
+	UCSR0C = (3<<UCSZ00);	
 
 	/* Flush receive buffer */
 	x = 0;

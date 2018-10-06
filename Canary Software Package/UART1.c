@@ -150,11 +150,11 @@ ISR(USART1_RX_vect)
 			//USART0_TransmitByte(UART1_RxBuf[5]);
 			for (i = 0; i<= tmphead; i++)
 			{
-				messageWant[i] = UART1_RxBuf[i];
+				messageWant[i] = UART1_RxBuf[i+1]; //UART1_RxBuf[i];
 
 			}
-			messageWant[i+1]=0x00;
-// 			UCSR1B &= !(1<<RXCIE1);  //Clear the receive interrupt on USART 1 until we're done reading all other sensors.
+			messageWant[i]=0x00; //messageWant[i+1]=0x00;
+ 			UCSR1B &= !((1<<RXCIE1)|(1<<RXEN1));  //Clear the receive interrupt on USART 1 until we're done reading all other sensors.
  			ItsTime = 1;
  			ToggleBit(PORTB, PORTB1);
 		}

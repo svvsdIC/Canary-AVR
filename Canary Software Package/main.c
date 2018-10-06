@@ -438,12 +438,11 @@ int main(void)
 			// - do a blocking read of the sensor
 			// - Send the data over the serial port
 			// - go to the next sensor 
-			//USART0_putstring(&messageWant[0]);
-			
- 			for (uint8_t i = 0; i<= 71; i++)
- 			{
- 				USART0_TransmitByte(messageWant[i]);
- 			}
+			//**********************************
+			// The GPS message triggers the whole collection cycle, so we can send it now...
+			printf("%s",messageWant);
+			_delay_ms(200);
+			//
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
 			//   2. Kick off the gas sensor reads - and go back for the results in a few milliseconds.  
@@ -465,7 +464,7 @@ int main(void)
 // 			distance = LIDAR_distance();
 // 			printf("\nLIDAR distance = %u", distance);
 // 			printf("\n LiDAR message = http://canary.chordsrt.com/measurements/url_create?instrument_id=3&dist=%u&key=4e6fba7420ec9e881f510bcddb&", distance); //need key
-// 			for (uint8_t i = 8; i<= 13; i++)//adds in time
+// 			for (uint8_t i = 8; i<= 13; i++)//adds in time (***Index may be off by onbe to fix string problem.  Try starting at [7] to <=14)
 // 			{
 // 				USART0_TransmitByte(messageWant[i]);
 // 				time[i] = messageWant[i];
@@ -481,11 +480,16 @@ int main(void)
 			// Note that this is a blocking read (stops all other activity)
 			// At present, the print statements are in that routine....
 			//...but the routine needs to be redesigned to operate in the background
- 			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
- 			printf("\nHydrogen = %u", raw_gas_vector[1]);
- 			printf("\nAmmonia = %u", raw_gas_vector[2]);
- 			printf("\nMethane = %u", raw_gas_vector[3]);
- 			printf("\nOzone = %u\n", raw_gas_vector[4]);
+//  			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
+//  			printf("\nHydrogen = %u", raw_gas_vector[1]);
+//  			printf("\nAmmonia = %u", raw_gas_vector[2]);
+//  			printf("\nMethane = %u", raw_gas_vector[3]);
+//  			printf("\nOzone = %u\n", raw_gas_vector[4]);
+ 			printf("\nCO = %u", raw_gas_vector[0]);
+ 			printf("\nH = %u", raw_gas_vector[1]);
+ 			printf("\nNA = %u", raw_gas_vector[2]);
+ 			printf("\nCH4 = %u", raw_gas_vector[3]);
+ 			printf("\nO3 = %u\n", raw_gas_vector[4]);
 			//
 			//============================
 			// Now read the BME interface...
@@ -501,7 +505,7 @@ int main(void)
 			//
 			//============================
 			//re-enable the GPS receiver & interrupt after processing all sensor data
-			// UCSR1B |= (1<<RXEN1);
+			UCSR1B |= ((1<<RXCIE1)|(1<<RXEN1));
 			// Go back to top of loop and wait for the GPS message to be received.
 		} else {
 		}

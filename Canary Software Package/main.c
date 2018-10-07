@@ -384,7 +384,7 @@ int main(void)
 	USART1_init(MYUBRR1);
 	//
 	// Initialize the TWI peripheral
-//	TWI_Master_Initialise();
+	TWI_Master_Initialise();
 	//
 	// Initialize the Analog to digital hardware - and test the I/F.
 	ADC_init();
@@ -402,7 +402,7 @@ int main(void)
 	sei();
 	//
 	// Initialize and check the BME interface...
-//	bme280basic_init();
+	bme280basic_init();
 	//
 	// Now that we've tried to initialize everything, we need to report status to the three LEDs sitting on
 	// the circuit board...the current placeholder routine does not do this so well.  Need to rethink this.
@@ -461,8 +461,8 @@ int main(void)
 			// don't want to use when debugging the code you are adding... 
 			//============================
 			 //Now test reading the LIDAR interface
-// 			distance = LIDAR_distance();
-// 			printf("\nLIDAR distance = %u", distance);
+ 			distance = LIDAR_distance();
+ 			printf("LIDAR distance = %u", distance);
 // 			printf("\n LiDAR message = http://canary.chordsrt.com/measurements/url_create?instrument_id=3&dist=%u&key=4e6fba7420ec9e881f510bcddb&", distance); //need key
 // 			for (uint8_t i = 8; i<= 13; i++)//adds in time (***Index may be off by onbe to fix string problem.  Try starting at [7] to <=14)
 // 			{

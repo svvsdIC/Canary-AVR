@@ -427,7 +427,7 @@ int main(void)
 		// When GPS is connected and enabled, then ItsTime gets set 
 		// to 1 whenever we get a $GPGGA message from that sensor.
 		///////////////////////////////////////////////////////////
-		if (ItsTime == 1){ //wait for our 1Hz flag
+		if (ItsTime == 1){ //wait for our 1Hz flag (from GPS or Interrupt)
 			ItsTime = 0; 
 			seconds++;
 			printf("\nSeconds = %u", seconds);
@@ -440,7 +440,7 @@ int main(void)
 			// - go to the next sensor 
 			//**********************************
 			// The GPS message triggers the whole collection cycle, so we can send it now...
-			printf("%s",messageWant);
+			printf("\n%s",messageWant);
 			_delay_ms(200);
 			//
 			// For this simple approach, we should probably visit the sensors in the following order:
@@ -464,6 +464,7 @@ int main(void)
  			distance = LIDAR_distance();
  			printf("LIDAR distance = %u", distance);
 // 			printf("\n LiDAR message = http://canary.chordsrt.com/measurements/url_create?instrument_id=3&dist=%u&key=4e6fba7420ec9e881f510bcddb&", distance); //need key
+			// NOTE: Will need to change the write mechanism below to use the stdout (FILE stream). 
 // 			for (uint8_t i = 8; i<= 13; i++)//adds in time (***Index may be off by onbe to fix string problem.  Try starting at [7] to <=14)
 // 			{
 // 				USART0_TransmitByte(messageWant[i]);
@@ -489,18 +490,18 @@ int main(void)
  			printf("\nH = %u", raw_gas_vector[1]);
  			printf("\nNA = %u", raw_gas_vector[2]);
  			printf("\nCH4 = %u", raw_gas_vector[3]);
- 			printf("\nO3 = %u\n", raw_gas_vector[4]);
+ 			printf("\nO3 = %u", raw_gas_vector[4]);
 			//
 			//============================
 			// Now read the BME interface...
-// 			bme280basic_bulk_data_read();
-// 			tempCelsius = BME280_compensate_T_int32(rawTemp);
+ 			bme280basic_bulk_data_read();
+ 			tempCelsius = BME280_compensate_T_int32(rawTemp);
 // 			sprintf(temperatureBuf, "%lu", tempCelsius);
-//  			printf("\nCelsius = %lu\n", tempCelsius);
-// 			pressure = BME280_compensate_P_int64(rawPress);
-// 			printf("\nPressure in Pa = %lu\n", pressure>>8);
-// 			humidity = bme280_compensate_H_int32(rawHum);
-// 			printf("\n Humidity in percent relative humidity= %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
+  			printf("\nCelsius = %lu", tempCelsius);
+ 			pressure = BME280_compensate_P_int64(rawPress);
+ 			printf("\nPressure in Pa = %lu", pressure>>8);
+ 			humidity = bme280_compensate_H_int32(rawHum);
+ 			printf("\nHumidity%% = %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
 // 			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb%.3s:%.4s:%.3s", temp, temp+2, pressure, humidity, time, time+2, time+4); //need key
 			//
 			//============================

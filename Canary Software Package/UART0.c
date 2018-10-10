@@ -152,5 +152,6 @@ ISR(USART0_UDRE_vect)
 		} else {
 		// Disable UDRE interrupt 
 		UCSR0B &= ~(1<<UDRIE0);
+		//flag here
 	}
 }

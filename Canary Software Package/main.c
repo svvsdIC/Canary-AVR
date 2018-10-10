@@ -441,7 +441,8 @@ int main(void)
 			//**********************************
 			// The GPS message triggers the whole collection cycle, so we can send it now...
 			printf("\n%s",messageWant);
-			_delay_ms(200);
+			//_delay_ms(200);
+			//REPLACE THE ABOVE DELAY WITH THE TRANSMIT COMPLETE FLAG WHILE STATEMENT
 			//
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0

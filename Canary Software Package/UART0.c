@@ -18,6 +18,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdio.h>
+#include "canary_common.h"
 
 /********************************************************************************
 						Global Variables
@@ -99,6 +100,7 @@ int USART0_Transmit_IO(char data, FILE *stream)
 	// Enable UDRE interrupt
 	UCSR0B |= (1<<UDRIE0);
 	return(0);
+	UART0TransmitCompleteFlag = 1;
 }
 
 // This put string function stops when it reaches the end of a string, which is
@@ -152,6 +154,6 @@ ISR(USART0_UDRE_vect)
 		} else {
 		// Disable UDRE interrupt 
 		UCSR0B &= ~(1<<UDRIE0);
-		//flag here
+		UART0TransmitCompleteFlag = 0;
 	}
 }

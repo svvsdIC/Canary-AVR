@@ -60,7 +60,6 @@ unsigned char BMEmessageBuf[TWI_BUFFER_SIZE], RawBMEdata[40];
 // 	dev.intf = BME280_I2C_INTF;
 // 	dev.read = user_i2c_read;
 // 	dev.write = user_i2c_write;
-// 	dev.delay_ms = user_delay_ms;
 // 	// Call the HW initialization routine
 // 	rslt = bme280_init(&dev);
 // 	
@@ -394,9 +393,7 @@ int main(void)
 	//
 	// Test our bad interrupt light...
 	SetBit(PORTB, PORTB2);
-	_delay_ms(500);
 	ClearBit(PORTB, PORTB2);
-	_delay_ms(500);
 	// 
 	// Start all interrupts
 	sei();
@@ -431,6 +428,7 @@ int main(void)
 			ItsTime = 0; 
 			seconds++;
 			printf("\nSeconds = %u", seconds);
+			while(UART0TransmitCompleteFlag != 0) {}
 //			sprintf(temperatureBuf, "%x\n", seconds);
 //			USART0_putstring(temperatureBuf);
 			// The next several lines sweep through ALL of the attached sensors and sends the data out the serial port.
@@ -441,7 +439,7 @@ int main(void)
 			//**********************************
 			// The GPS message triggers the whole collection cycle, so we can send it now...
 			printf("\n%s",messageWant);
-			//_delay_ms(200);
+			while(UART0TransmitCompleteFlag != 0) {}
 			//REPLACE THE ABOVE DELAY WITH THE TRANSMIT COMPLETE FLAG WHILE STATEMENT
 			//
 			// For this simple approach, we should probably visit the sensors in the following order:
@@ -464,6 +462,7 @@ int main(void)
 			 //Now test reading the LIDAR interface
  			distance = LIDAR_distance();
  			printf("LIDAR distance = %u", distance);
+			while(UART0TransmitCompleteFlag != 0) {}
 // 			printf("\n LiDAR message = http://canary.chordsrt.com/measurements/url_create?instrument_id=3&dist=%u&key=4e6fba7420ec9e881f510bcddb&", distance); //need key
 			// NOTE: Will need to change the write mechanism below to use the stdout (FILE stream). 
 // 			for (uint8_t i = 8; i<= 13; i++)//adds in time (***Index may be off by onbe to fix string problem.  Try starting at [7] to <=14)
@@ -492,6 +491,7 @@ int main(void)
  			printf("\nNA = %u", raw_gas_vector[2]);
  			printf("\nCH4 = %u", raw_gas_vector[3]);
  			printf("\nO3 = %u", raw_gas_vector[4]);
+			while(UART0TransmitCompleteFlag != 0) {}
 			//
 			//============================
 			// Now read the BME interface...
@@ -503,6 +503,7 @@ int main(void)
  			printf("\nPressure in Pa = %lu", pressure>>8);
  			humidity = bme280_compensate_H_int32(rawHum);
  			printf("\nHumidity%% = %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
+			while(UART0TransmitCompleteFlag != 0) {}
 // 			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb%.3s:%.4s:%.3s", temp, temp+2, pressure, humidity, time, time+2, time+4); //need key
 			//
 			//============================

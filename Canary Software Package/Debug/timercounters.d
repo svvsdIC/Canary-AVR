@@ -23,7 +23,8 @@ timercounters.d timercounters.o: .././timercounters.c \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\string.h \
  .././timercounters.h .././UART0.h .././UART1.h .././adc.h \
- .././gas_sensors.h .././TWI_Master.h .././RGBsensor.h .././LIDAR.h
+ .././gas_sensors.h .././TWI_Master.h .././RGBsensor.h .././LIDAR.h \
+ .././BME280.h
 
 .././canary_common.h:
 
@@ -86,3 +87,5 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 .././RGBsensor.h:
 
 .././LIDAR.h:
+
+.././BME280.h:

@@ -31,6 +31,7 @@
 #include "TWI_Master.h"   // I2C routines and initialization
 #include "RGBsensor.h"  // Not needed for production - here to test I2C
 #include "LIDAR.h"	//LIDAR specific routines
+#include "BME280.h" //BME code
 
 // ************** The following are needed for the file system and MicroSD card
 //#include <avr/pgmspace.h>

@@ -89,6 +89,8 @@ void USART0_TransmitByte(unsigned char data)
 int USART0_Transmit_IO(char data, FILE *stream)
 {
 	unsigned char tmphead;
+	//Flag that the transmitting is not done yet
+	UART0TransmitCompleteFlag = 1;
 	// Calculate buffer index
 	tmphead = (UART0_TxHead + 1) & UART0_TX_BUFFER_MASK;
 	// Wait for free space in buffer
@@ -100,7 +102,6 @@ int USART0_Transmit_IO(char data, FILE *stream)
 	// Enable UDRE interrupt
 	UCSR0B |= (1<<UDRIE0);
 	return(0);
-	UART0TransmitCompleteFlag = 1;
 }
 
 // This put string function stops when it reaches the end of a string, which is
@@ -154,6 +155,7 @@ ISR(USART0_UDRE_vect)
 		} else {
 		// Disable UDRE interrupt 
 		UCSR0B &= ~(1<<UDRIE0);
+		//indicate transmission is complete
 		UART0TransmitCompleteFlag = 0;
 	}
 }

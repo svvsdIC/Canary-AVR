@@ -1,5 +1,5 @@
 /******************************************************************************
- * LIDAR.c
+ * BME280.c
  *
  * Defines and function prototypes for BME280 device
  * 1/2017 3:23:35 PM

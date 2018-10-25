@@ -6,9 +6,13 @@
  * Sparkfun GPS sensor which sends data at 9600 Baud, 8 data bits, 1 stop bit,
  *  no parity, and no flow control.
  * Based on Atmel's series "Getting Started with AVR" on Youtube.
+ * This sensor is read only, so no transmit functions are used and the UDRE
+ * interrupt is therefore not enabled.  Reception of the GPGGA message from 
+ * the sensor sets a flag indicating we have the message we want.  this triggers
+ * the data collection sequence in main().
  *
  * Created: 3/19/2017 8:39:04 PM
- * Author: Craig R
+ * Author: Canary Team
  *******************************************************************************/ 
 
 /********************************************************************************
@@ -153,7 +157,7 @@ ISR(USART1_RX_vect)
 				messageWant[i] = UART1_RxBuf[i+1]; //UART1_RxBuf[i];
 
 			}
-			messageWant[i]=0x00; //messageWant[i+1]=0x00;
+			messageWant[i-3]=0x00; //This sets the end of the string after the checksum, removing the CR/LF codes from the string.
  			UCSR1B &= !((1<<RXCIE1)|(1<<RXEN1));  //Clear the receive interrupt on USART 1 until we're done reading all other sensors.
  			ItsTime = 1;
  			ToggleBit(PORTB, PORTB1);

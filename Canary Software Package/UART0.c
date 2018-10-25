@@ -6,9 +6,13 @@
  * 1 stop bits, no parity, and no flow control on a chip with no external
  * crystal.  It should run much faster with a better clock source.
  * Based on Atmel's series "Getting Started with AVR" on Youtube.
+ * In the Canary application, UART0 is a transmit only over a data radio.
+ * To reduce chance of interrupt collisions, this version includes a flag to 
+ * indicate when a large transmit is in progress, clearing the flag when it has
+ * completed sending the string.
  *
  * Created: 3/19/2017 8:39:04 PM
- * Author: Craig R
+ * Author: Canary Team
  *******************************************************************************/ 
 
 /********************************************************************************
@@ -90,7 +94,7 @@ int USART0_Transmit_IO(char data, FILE *stream)
 {
 	unsigned char tmphead;
 	//Flag that the transmitting is not done yet
-	UART0TransmitCompleteFlag = 1;
+	UART0TransmitInProgress = 1;
 	// Calculate buffer index
 	tmphead = (UART0_TxHead + 1) & UART0_TX_BUFFER_MASK;
 	// Wait for free space in buffer
@@ -121,7 +125,8 @@ void USART0_putstring(char* StringPtr) {
 *********************************************************************************
 ********************************************************************************/
 
-
+// The canary project does not receive on USART0, therefore the receive 
+// interrupt is commented out.
 /*ISR(USART0_RX_vect)
 {
 	unsigned char data;
@@ -152,10 +157,11 @@ ISR(USART0_UDRE_vect)
 		UART0_TxTail = tmptail;
 		// Start transmission 
 		UDR0 = UART0_TxBuf[tmptail];
-		} else {
+		} 
+		else {
 		// Disable UDRE interrupt 
 		UCSR0B &= ~(1<<UDRIE0);
-		//indicate transmission is complete
-		UART0TransmitCompleteFlag = 0;
+		// Indicate transmission is complete
+		UART0TransmitInProgress = 0;
 	}
 }

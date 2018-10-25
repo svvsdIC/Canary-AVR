@@ -81,7 +81,8 @@ volatile uint8_t ItsTime;
 // USART 1 is the GPS and is receive only, so comment out the following for the GPS port...
 //static FILE mystdout1 = FDEV_SETUP_STREAM(USART1_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
 static FILE mystdout = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
-static uint8_t UART0TransmitCompleteFlag;
+// This sets up a flag to indicate when USART0 is busy sending a large string.
+static uint8_t UART0TransmitInProgress;
 /********************************************************************************
 						Function Prototypes
 ********************************************************************************/

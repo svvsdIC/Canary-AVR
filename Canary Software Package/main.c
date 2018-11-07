@@ -109,6 +109,13 @@ int main(void)
  	// *************************************************************************
  	// main loop
  	// *************************************************************************
+	while(BitIsSet(PORTB,PORTB3) == 1)//makes program start loop once everything is ready
+	{
+		ToggleBit(PORTB, PORTB2); //will flash yellow LED until button is pressed.
+		_delay_ms(1000);
+		ToggleBit(PORTB, PORTB2);
+		_delay_ms(1000);
+	}
 	while (1) 
     {
 		//////////////////////////////////////////////////////////

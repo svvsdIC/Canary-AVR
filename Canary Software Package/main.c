@@ -31,6 +31,10 @@ char String[]="Hello World!! The serial port is working!";
 extern char messageWant [UART1_RX_BUFFER_SIZE];
 volatile uint16_t seconds;
 
+//variables for calibration routines only used for when not in calibration
+int R0_VALS_GAS_SENSORS[6] = {381, 508, 308, 405, 38, 0}; //all R0 values. We may have a 6th sensor but it is currently not in existence
+//look up tables - taken from Aileen sensor order is: CO, H , NH3, CH4, O3
+
 /********************************************************************************
 						Functions
 ********************************************************************************/
@@ -104,18 +108,15 @@ int main(void)
 	// ===================================================
 	// The next few lines are for debugging the (working at one time) UART0 routines...remove these lines once it is working again.
 	printf("\n%s",String);
+	//wait until button is pushed before proceeding to loop
+	ToggleBit(PORTB, PORTB0); //will keep yellow LED until button is pressed.
+//	while(BitIsSet(PORTB,PORTB3)) {}//makes program wait until everything is ready(button is pushed) //not working we don't know why
 	// ====================================================
 	////////////////////////////////////////////////////////////////////////////
  	// *************************************************************************
  	// main loop
  	// *************************************************************************
-	while(BitIsSet(PORTB,PORTB3) == 1)//makes program start loop once everything is ready
-	{
-		ToggleBit(PORTB, PORTB2); //will flash yellow LED until button is pressed.
-		_delay_ms(1000);
-		ToggleBit(PORTB, PORTB2);
-		_delay_ms(1000);
-	}
+	ToggleBit(PORTB, PORTB0);
 	while (1) 
     {
 		//////////////////////////////////////////////////////////

@@ -118,14 +118,14 @@ void start_gas_sensor_read(void)
 	}
 }
 
-void binary_search(int[] array, int top, int bottom, int number) //return value directly above & below number
+void binary_search(int array[], int top, int bottom, int number) //return value directly above & below number
 {
-	if (number > array[top] | number < array[bottom])
+	if ((number > array[top]) | (number < array[bottom]))
 	{
 		int mid = bottom + (top - bottom)/2;
 		
 		// If the element is closest to the middle
-		if (number >= array[mid] && number =< array [mid + 1])
+		if (number >= array[mid] && number <= array [mid + 1])
 		{
 			valueOfIndex = mid + 1;
 		}
@@ -142,11 +142,20 @@ void binary_search(int[] array, int top, int bottom, int number) //return value 
 	
 	// We reach here when element is not
 	// present in array
-	printf('value not in array');
+	//printf('value not in array');
 }
 
 uint16_t convert_to_ppm(uint8_t sensor_id)
 {
+	int R0_VALS_GAS_SENSORS[6] = {381, 508, 308, 405, 38, 0}; //all R0 values. We may have a 6th sensor but it is currently not in existence
+	int R0_RATIOS_CO[2][64] = {{101, 99, 98, 96, 95, 93, 92, 90, 89, 87, 86, 84, 83, 81, 80, 78, 77, 75, 74, 72, 71, 69, 67, 66, 64, 63, 61, 60,
+	58, 57, 55, 54, 52, 51, 49, 48, 46, 45, 43, 42, 40, 39, 37, 35, 34, 32, 31, 29, 28, 26, 25, 23, 22, 20, 19, 17, 16, 14, 13, 11, 10, 8, 7, 5}, //R0 ratio corresponding to certain ppm val
+	{44, 52, 53, 54, 55, 57, 57, 59, 60, 62, 64, 66, 67, 70, 71, 74, 75, 78, 80, 83, 85, 88, 92, 94, 99, 102, 107, 110, 116, 119, 125, 128,
+	135, 139, 146, 150, 159, 163, 174, 180, 192, 200, 216, 233, 243, 264, 278, 306, 323, 359, 381, 432, 466, 542, 586, 699, 779, 980, 1101, 1434, 1684, 2409, 2955, 4563}};//PPM values
+	baseIndexToTable = 0;
+	interpolationNum = 0;
+	numTimes256 = 0;
+	valueOfIndex = 0;
 	//Take the smallest R1/R0 value and the largest R1/R0 value from the original set of data points
 	//Multiply them by a number that is a power of two (so that the values are large enough to divide by 64 later)
 	//Round the two values to the nearest integer value
@@ -160,10 +169,10 @@ uint16_t convert_to_ppm(uint8_t sensor_id)
 	//Get approx ppm
 	//write equation
 	//First sensor is CO
-	numTimes256 = (raw_gas_vector[0]<<256)/(R0_VALS_GAS_SENSORS[0]<<256); //temporary routine while there is only 1 sensor, will be put into a loop later
+	numTimes256 = (raw_gas_vector[0]<<8)/(R0_VALS_GAS_SENSORS[0]<<8); //temporary routine while there is only 1 sensor, will be put into a loop later
 	interpolationNum = 0x03 | numTimes256;
 	baseIndexToTable = numTimes256 >> 2;
 	binary_search(R0_RATIOS_CO[0], 0, 63, baseIndexToTable);
-	ppmValue[0] = ((R0_RATIOS_CO[1][valueOfIndex] - R0_RATIOS_CO[1][valueOfIndex-1])*interpolationNum)>>2 + R0_RATIOS_CO[1][valueOfIndex-1];
+	ppmValue[0] = (((R0_RATIOS_CO[1][valueOfIndex] - R0_RATIOS_CO[1][valueOfIndex-1])*interpolationNum)>>2) + R0_RATIOS_CO[1][valueOfIndex-1];
 
 }

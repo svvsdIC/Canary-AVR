@@ -216,6 +216,8 @@ int main(void)
 // 			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb%.3s:%.4s:%.3s", temp, temp+2, pressure, humidity, time, time+2, time+4); //need key
 			//
 			//============================
+			convert_to_ppm(0); //only works for co right now
+			printf("ppm value CO: %d", ppmValue[0]);
 			//re-enable the GPS receiver & interrupt after processing all sensor data
 			UCSR1B |= ((1<<RXCIE1)|(1<<RXEN1));
 			// Go back to top of loop and wait for the GPS message to be received.

@@ -120,7 +120,7 @@ void start_gas_sensor_read(void)
 
 void binary_search(int array[], int top, int bottom, int number) //return value directly above & below number
 {
-	if ((number > array[top]) | (number < array[bottom]))
+	if ((number > array[top]) && (number < array[bottom]))
 	{
 		int mid = bottom + (top - bottom)/2;
 		
@@ -139,7 +139,10 @@ void binary_search(int array[], int top, int bottom, int number) //return value 
 		// in right subarray
 		return binary_search(array, top, mid+1, number);
 	}
-	
+	else
+	{
+		return 0;
+	}
 	// We reach here when element is not
 	// present in array
 	//printf('value not in array');
@@ -169,10 +172,10 @@ uint16_t convert_to_ppm(uint8_t sensor_id)
 	//Get approx ppm
 	//write equation
 	//First sensor is CO
-	numTimes256 = (raw_gas_vector[0]<<8)/(R0_VALS_GAS_SENSORS[0]<<8); //temporary routine while there is only 1 sensor, will be put into a loop later
-	interpolationNum = 0x03 | numTimes256;
+	numTimes256 = (raw_gas_vector[0]<<8)/(R0_VALS_GAS_SENSORS[0]); //temporary routine while there is only 1 sensor, will be put into a loop later
+	interpolationNum = 0x03 || numTimes256;
 	baseIndexToTable = numTimes256 >> 2;
 	binary_search(R0_RATIOS_CO[0], 0, 63, baseIndexToTable);
-	ppmValue[0] = (((R0_RATIOS_CO[1][valueOfIndex] - R0_RATIOS_CO[1][valueOfIndex-1])*interpolationNum)>>2) + R0_RATIOS_CO[1][valueOfIndex-1];
+	ppmValue[0] = (((R0_RATIOS_CO[1][valueOfIndex] - R0_RATIOS_CO[1][valueOfIndex-1])*interpolationNum)>>4) + R0_RATIOS_CO[1][valueOfIndex-1];
 
 }

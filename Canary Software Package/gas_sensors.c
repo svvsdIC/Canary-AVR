@@ -56,6 +56,10 @@ void gas_sensors_init(void)
 	// Enable the ADC
 	SetBit(ADCSRA, ADEN);
 	
+	
+	
+	
+	
 	//Read initial value from the sensors
 	for(sensor_id = 0; sensor_id < 5; sensor_id++)
 	{
@@ -75,6 +79,14 @@ void gas_sensors_init(void)
 			SetBit(gas_sensor_initialization_errors,(sensor_id+3));  // If not, report an error
 		}		
 	}
+	
+
+	
+	
+	
+	
+	
+	
 	ClearBit(ADCSRA, ADEN);  //Disable the ADC until we go operational
 	// Report status via the LED that the gas sensors are ready (or not)
 	//display_status(gas_sensors, gas_sensor_initialization_errors);
@@ -151,10 +163,14 @@ void binary_search(int array[], int top, int bottom, int number) //return value 
 uint16_t convert_to_ppm(uint8_t sensor_id)
 {
 	int R0_VALS_GAS_SENSORS[6] = {381, 508, 308, 405, 38, 0}; //all R0 values. We may have a 6th sensor but it is currently not in existence
-	int R0_RATIOS_CO[2][64] = {{101, 99, 98, 96, 95, 93, 92, 90, 89, 87, 86, 84, 83, 81, 80, 78, 77, 75, 74, 72, 71, 69, 67, 66, 64, 63, 61, 60,
+	int R0_RATIOS_CO[6][2][64] = {{{101, 99, 98, 96, 95, 93, 92, 90, 89, 87, 86, 84, 83, 81, 80, 78, 77, 75, 74, 72, 71, 69, 67, 66, 64, 63, 61, 60,
 	58, 57, 55, 54, 52, 51, 49, 48, 46, 45, 43, 42, 40, 39, 37, 35, 34, 32, 31, 29, 28, 26, 25, 23, 22, 20, 19, 17, 16, 14, 13, 11, 10, 8, 7, 5}, //R0 ratio corresponding to certain ppm val
 	{44, 52, 53, 54, 55, 57, 57, 59, 60, 62, 64, 66, 67, 70, 71, 74, 75, 78, 80, 83, 85, 88, 92, 94, 99, 102, 107, 110, 116, 119, 125, 128,
-	135, 139, 146, 150, 159, 163, 174, 180, 192, 200, 216, 233, 243, 264, 278, 306, 323, 359, 381, 432, 466, 542, 586, 699, 779, 980, 1101, 1434, 1684, 2409, 2955, 4563}};//PPM values
+	135, 139, 146, 150, 159, 163, 174, 180, 192, 200, 216, 233, 243, 264, 278, 306, 323, 359, 381, 432, 466, 542, 586, 699, 779, 980, 1101, 1434, 1684, 2409, 2955, 4563}},//PPM values
+	{{8, 7, 7, 6, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8},{208, 219, 232, 244, 258, 272, 287, 303, 320, 338, 357, 376, 397, 419, 442, 467, 
+	493, 515, 544, 574, 605, 639, 674, 712, 751, 793, 824, 868, 914, 964, 1017, 1074, 1134, 1197, 1263, 1333, 1407, 1485, 1532, 1614, 1703, 1798, 1892, 2000, 2099, 2219, 
+	2342, 2472, 2609, 754, 2906, 3037, 3205, 3383, 3570, 3768, 3977, 4197, 4430, 4675, 4934, 5067, 5323, 5604, 5915, 6242, 6588, 6952, 7337, 7744, 8172, 8625, 9102, 9606, 10031, 205}}};
 	baseIndexToTable = 0;
 	interpolationNum = 0;
 	numTimes256 = 0;

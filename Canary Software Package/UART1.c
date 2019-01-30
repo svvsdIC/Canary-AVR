@@ -35,6 +35,10 @@ static volatile unsigned char UART1_TxHead;
 static volatile unsigned char UART1_TxTail;
 unsigned char UART1_RxBuf [UART1_RX_BUFFER_SIZE];
 char messageWant [UART1_RX_BUFFER_SIZE];
+int commaCount = 0;
+int startLat = 0;
+int startLong = 0;
+int startAlt = 0;
 extern volatile uint8_t ItsTime;
 
 /********************************************************************************
@@ -145,7 +149,7 @@ ISR(USART1_RX_vect)
 	}
 	// Store received data in buffer 
 	UART1_RxBuf[tmphead] = data;
-	
+	commaCount = 0;
 	if (data == 10)
 	{
 		//USART0_TransmitByte('n');
@@ -155,6 +159,34 @@ ISR(USART1_RX_vect)
 			for (i = 0; i<= tmphead; i++)
 			{
 				messageWant[i] = UART1_RxBuf[i+1]; //UART1_RxBuf[i];
+				if(UART1_RxBuf[i+1] == ',')
+				{
+					commaCount = commaCount + 1;
+					if (commaCount == 2)
+					{
+						startLat = i;
+					}
+					if (commaCount == 4)
+					{
+						startLong = i;
+					}
+					if (commaCount == 9)
+					{
+						startLong = i;
+					}
+				}
+				if (commaCount == 2)
+				{
+					latitude[i-startLat] = UART1_RxBuf[i+1];
+				}
+				if (commaCount == 2)
+				{
+					longitude[i-startLong] = UART1_RxBuf[i+1];
+				}
+				if (commaCount == 9)
+				{
+					altitude[i-startAlt] = UART1_RxBuf[i+1];
+				}
 
 			}
 			messageWant[i-3]=0x00; //This sets the end of the string after the checksum, removing the CR/LF codes from the string.

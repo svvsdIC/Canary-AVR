@@ -30,6 +30,7 @@ uint8_t debugdata;
 char String[]="Hello World!! The serial port is working!";
 extern char messageWant [UART1_RX_BUFFER_SIZE];
 volatile uint16_t seconds;
+uint8_t printType = 1;
 
 
 //look up tables - taken from Aileen sensor order is: CO, H , NH3, CH4, O3
@@ -127,9 +128,9 @@ int main(void)
 		if (ItsTime == 1){ //wait for our 1Hz flag (from GPS or Interrupt)
 			ItsTime = 0; 
  			seconds++;
- 			printf("\nSeconds = %u", seconds);
-			// Wait until the transmission is complete
-			while(UART0TransmitInProgress) {}
+//  			printf("\nSeconds = %u", seconds);
+// 			// Wait until the transmission is complete
+// 			while(UART0TransmitInProgress) {}
 			// The next several lines sweep through ALL of the attached sensors and sends the data out the serial port.
 			// It is VERY simple at present:
 			// - Read each sensor
@@ -138,7 +139,7 @@ int main(void)
 			// - go to the next sensor 
 			//**********************************
 			// The GPS message triggers the whole collection cycle, so we can send it now...
-			printf("\n%s",messageWant);
+// 			printf("\n%s",messageWant);
 			while(UART0TransmitInProgress) {}
 			//REPLACE THE ABOVE DELAY WITH THE TRANSMIT COMPLETE FLAG WHILE STATEMENT
 			//
@@ -160,9 +161,9 @@ int main(void)
 			// don't want to use when debugging the code you are adding... 
 			//============================
 			 //Now test reading the LIDAR interface
-// 			distance = LIDAR_distance();
- 			printf("\nLIDAR distance = %u", distance);
-			while(UART0TransmitInProgress) {}
+ 			distance = LIDAR_distance();
+//  			printf("\nLIDAR distance = %u", distance);
+// 			while(UART0TransmitInProgress) {}
 // 			printf("\n LiDAR message = http://canary.chordsrt.com/measurements/url_create?instrument_id=3&dist=%u&key=4e6fba7420ec9e881f510bcddb&", distance); //need key
 			// NOTE: Will need to change the write mechanism below to use the stdout (FILE stream). 
 // 			for (uint8_t i = 8; i<= 13; i++)//adds in time (***Index may be off by onbe to fix string problem.  Try starting at [7] to <=14)
@@ -186,16 +187,16 @@ int main(void)
 //  			printf("\nAmmonia = %u", raw_gas_vector[2]);
 //  			printf("\nMethane = %u", raw_gas_vector[3]);
 //  			printf("\nOzone = %u\n", raw_gas_vector[4]);
- 			printf("\nCO = %u", raw_gas_vector[0]);
-			while(UART0TransmitInProgress) {}
- 			printf("\nH = %u", raw_gas_vector[1]);
-			while(UART0TransmitInProgress) {}
- 			printf("\nNA = %u", raw_gas_vector[2]);
-			while(UART0TransmitInProgress) {} 
- 			printf("\nCH4 = %u", raw_gas_vector[3]);
-			while(UART0TransmitInProgress) {}
- 			printf("\nO3 = %u", raw_gas_vector[4]);
-			while(UART0TransmitInProgress) {}
+//  			printf("\nCO = %u", raw_gas_vector[0]);
+// 			while(UART0TransmitInProgress) {}
+//  			printf("\nH = %u", raw_gas_vector[1]);
+// 			while(UART0TransmitInProgress) {}
+//  			printf("\nNA = %u", raw_gas_vector[2]);
+// 			while(UART0TransmitInProgress) {} 
+//  			printf("\nCH4 = %u", raw_gas_vector[3]);
+// 			while(UART0TransmitInProgress) {}
+//  			printf("\nO3 = %u", raw_gas_vector[4]);
+// 			while(UART0TransmitInProgress) {}
 			//
 			//============================
 			// Now read the BME interface...
@@ -203,16 +204,16 @@ int main(void)
  			// Calculate the temperature and print it
 			tempCelsius = BME280_compensate_T_int32(rawTemp);
 // 			sprintf(temperatureBuf, "%lu", tempCelsius);
-  			printf("\nCelsius = %lu", tempCelsius);
-			while(UART0TransmitInProgress) {}
+//  			printf("\nCelsius = %lu", tempCelsius);
+//			while(UART0TransmitInProgress) {}
  			// Calculate the pressure and print it
 			pressure = BME280_compensate_P_int64(rawPress);
- 			printf("\nPressure in Pa = %lu", pressure>>8);
-			while(UART0TransmitInProgress) {}
+// 			printf("\nPressure in Pa = %lu", pressure>>8);
+//			while(UART0TransmitInProgress) {}
  			// Calculate the humidity and print it
 			 humidity = bme280_compensate_H_int32(rawHum);
- 			printf("\nHumidity%% = %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
-			while(UART0TransmitInProgress) {}
+// 			printf("\nHumidity%% = %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
+//			while(UART0TransmitInProgress) {}
 // 			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb%.3s:%.4s:%.3s", temp, temp+2, pressure, humidity, time, time+2, time+4); //need key
 			//
 			//============================
@@ -228,15 +229,69 @@ int main(void)
 			
 			
 			
-			printf("ppm value CO: %d", ppmValue[0]);
-			
-			printf("ppm value H2: %d", ppmValue[1]);
-			printf("ppm value NH3: %d", ppmValue[2]);
-			printf("ppm value CH4: %d", ppmValue[3]);
-			printf("ppm value O3: %d", ppmValue[4]);
-			
-			
-			
+// 			printf("ppm value CO: %d \n", ppmValue[0]);
+// 			printf("ppm value H2: %d \n", ppmValue[1]);
+// 			printf("ppm value NH3: %d \n", ppmValue[2]);
+// 			printf("ppm value CH4: %d \n", ppmValue[3]);
+// 			printf("ppm value O3: %d \n", ppmValue[4]);
+// 			while(UART0TransmitInProgress) {}
+
+			//print statements
+			// ----------- debug -------------- //
+			if (printType == 0)
+			{
+				//# seconds
+				printf("\nSeconds = %u", seconds);
+				// LiDAR
+				while(UART0TransmitInProgress) {}
+ 				printf("\nLIDAR distance = %u", distance);
+				// Gas sensors
+ 				while(UART0TransmitInProgress) {}
+				printf("\nCO = %u", raw_gas_vector[0]);
+				while(UART0TransmitInProgress) {}
+				printf("\nH = %u", raw_gas_vector[1]);
+				while(UART0TransmitInProgress) {}
+				printf("\nNA = %u", raw_gas_vector[2]);
+				while(UART0TransmitInProgress) {}
+				printf("\nCH4 = %u", raw_gas_vector[3]);
+				while(UART0TransmitInProgress) {}
+				printf("\nO3 = %u", raw_gas_vector[4]);
+				while(UART0TransmitInProgress) {}
+				//BME 280
+				printf("\nCelsius = %d.%.2d", (int) (tempCelsius/100), (int) (tempCelsius%100));
+				while(UART0TransmitInProgress) {}
+				printf("\nPressure in Pa = %lu", pressure>>8);
+				while(UART0TransmitInProgress) {}
+				printf("\nHumidity%% = %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
+				while(UART0TransmitInProgress) {}
+				//ppm values of gas sensors
+				printf("ppm value CO: %d \n", ppmValue[0]);
+				printf("ppm value H2: %d \n", ppmValue[1]);
+				printf("ppm value NH3: %d \n", ppmValue[2]);
+				printf("ppm value CH4: %d \n", ppmValue[3]);
+				printf("ppm value O3: %d \n", ppmValue[4]);
+				while(UART0TransmitInProgress) {}
+				//GPS data
+				printf("\n%s",messageWant);
+			}
+			// ---------- final --------------- //
+			/*			instrument_id,data,moreData,LastData|instrument2_id...
+			Instrument ids:
+			1 = BME280
+			Order: temp, pressure, humidity
+			2 = Gas sensors
+			Order: CO, NH3, O3, CH4, H2
+			3 = LiDAR
+			Order: Distance
+			4 = GPS
+			Order: lat, long, altitude */
+			if (printType == 1)
+			{
+				printf("1,%d.%.2d,%d,%d|", (int) (tempCelsius/100), (int) (tempCelsius%100), pressure>>8, humidity>>10);
+				printf("2,%d,%d,%d,%d,%d,%d|", raw_gas_vector[0], raw_gas_vector[1], raw_gas_vector[2], raw_gas_vector[3], raw_gas_vector[4], raw_gas_vector[5]);
+				printf("3,%d|",distance);
+				printf("4,%d,%d,%d|",latitude,longitude,altitude);
+			}
 			//re-enable the GPS receiver & interrupt after processing all sensor data
 			UCSR1B |= ((1<<RXCIE1)|(1<<RXEN1));
 			// Go back to top of loop and wait for the GPS message to be received.

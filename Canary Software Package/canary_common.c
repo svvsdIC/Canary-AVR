@@ -61,6 +61,9 @@ void canary_io_pin_initialization(void) {
 	DDRB  = 0x07;
 	//
 	// Set all LEDs off
+	// PORTB Pin 0(PORTB2) is the RED LED
+	// PORTB Pin 1(PORTB2) is the GREEN LED
+	// PORTB Pin 2(PORTB2) is the BLUE LED
 	PORTB &= !0x07;
 	// The Canary start button is on Port B pin 3.  Set the pull-up resistor for pin 3:
 	SetBit(PORTB, PORTB3);

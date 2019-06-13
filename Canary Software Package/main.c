@@ -31,6 +31,7 @@ char String[]="Hello World!! The serial port is working!";
 extern char messageWant [UART1_RX_BUFFER_SIZE];
 volatile uint16_t seconds;
 uint8_t printType = 1;
+uint8_t GPSlock = 0; //flag to indicate if we're getting position data.
 
 
 //look up tables - taken from Aileen sensor order is: CO, H , NH3, CH4, O3
@@ -62,6 +63,8 @@ int main(void)
 	// Set the I/O pins
 	canary_io_pin_initialization();
 	//
+	// Turn on the RED LED until we have finished initialization
+	SetBit(PORTB, PORTB0);
 	// Set a simple counter for the loop below.  Debug only.
 	seconds=0;
 	ItsTime=0;
@@ -87,36 +90,39 @@ int main(void)
 	//
 	// initialize the gas sensors
 	gas_sensors_init();
-	//
-	// Test our bad interrupt light...
-	SetBit(PORTB, PORTB2);
-	ClearBit(PORTB, PORTB2);
 	// 
 	// Start all interrupts
 	sei();
 	//
 	// Initialize and check the BME interface...
-	bme280basic_init();
+//!	bme280basic_init();
 	//
 	// Now that we've tried to initialize everything, we need to report status to the three LEDs sitting on
 	// the circuit board...the current placeholder routine does not do this so well.  Need to rethink this.
 	// display_status(gas_sensors, gas_sensor_initialization_errors);
 	//
-	// Wait here for the start/standby button to be selected.. (PORTB pin 3).
-	// Now call the routines to "kick off" the sensor measurements
+	// Clear the Red LED to indicate all things are initialized.
+	ClearBit(PORTB, PORTB0);
 	//
-	// ===================================================
-	// The next few lines are for debugging the (working at one time) UART0 routines...remove these lines once it is working again.
-	printf("\n%s",String);
-	//wait until button is pushed before proceeding to loop
-	ToggleBit(PORTB, PORTB0); //will keep yellow LED until button is pressed.
+	// ***modify UART1 interrupt code to set the GPSlock flag is distance data is detected ***
+	// *** (and turn on the BLUE LED so the operator knows when it is locked).***
+	//
+	// Wait here for the start/standby button to be selected.. (PORTB pin 3).
 //	while(BitIsSet(PORTB,PORTB3)) {}//makes program wait until everything is ready(button is pushed) //not working we don't know why
-	// ====================================================
+	//
+	//Proceed to main loop with warning to ground system re: GPSlock
+	if (GPSlock==1) 
+		{
+			printf("\n%s", "Proceeding with GPS lock");
+		}
+		else
+		{
+			printf("\n%s", "Proceeding without GPS lock");
+		} 
 	////////////////////////////////////////////////////////////////////////////
  	// *************************************************************************
  	// main loop
  	// *************************************************************************
-	ToggleBit(PORTB, PORTB0);
 	while (1) 
     {
 		//////////////////////////////////////////////////////////
@@ -161,12 +167,12 @@ int main(void)
 			// don't want to use when debugging the code you are adding... 
 			//============================
 			 //Now test reading the LIDAR interface
- 			distance = LIDAR_distance();
+			distance = LIDAR_distance();
 //  			printf("\nLIDAR distance = %u", distance);
 // 			while(UART0TransmitInProgress) {}
 // 			printf("\n LiDAR message = http://canary.chordsrt.com/measurements/url_create?instrument_id=3&dist=%u&key=4e6fba7420ec9e881f510bcddb&", distance); //need key
 			// NOTE: Will need to change the write mechanism below to use the stdout (FILE stream). 
-// 			for (uint8_t i = 8; i<= 13; i++)//adds in time (***Index may be off by onbe to fix string problem.  Try starting at [7] to <=14)
+// 			for (uint8_t i = 8; i<= 13; i++)//adds in time (***Index may be off by one to fix string problem.  Try starting at [7] to <=14)
 // 			{
 // 				USART0_TransmitByte(messageWant[i]);
 // 				time[i] = messageWant[i];
@@ -200,18 +206,18 @@ int main(void)
 			//
 			//============================
 			// Now read the BME interface...
- 			bme280basic_bulk_data_read();
+//! 		bme280basic_bulk_data_read();
  			// Calculate the temperature and print it
-			tempCelsius = BME280_compensate_T_int32(rawTemp);
+//!			tempCelsius = BME280_compensate_T_int32(rawTemp);
 // 			sprintf(temperatureBuf, "%lu", tempCelsius);
 //  			printf("\nCelsius = %lu", tempCelsius);
 //			while(UART0TransmitInProgress) {}
  			// Calculate the pressure and print it
-			pressure = BME280_compensate_P_int64(rawPress);
+//!			pressure = BME280_compensate_P_int64(rawPress);
 // 			printf("\nPressure in Pa = %lu", pressure>>8);
 //			while(UART0TransmitInProgress) {}
  			// Calculate the humidity and print it
-			 humidity = bme280_compensate_H_int32(rawHum);
+//!			 humidity = bme280_compensate_H_int32(rawHum);
 // 			printf("\nHumidity%% = %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
 //			while(UART0TransmitInProgress) {}
 // 			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb%.3s:%.4s:%.3s", temp, temp+2, pressure, humidity, time, time+2, time+4); //need key
@@ -222,13 +228,6 @@ int main(void)
 			{
 				convert_to_ppm(i); //only works for co right now
 			}
-			
-		
-			
-			//convert_to_ppm(0); //only works for co right now
-			
-			
-			
 // 			printf("ppm value CO: %d \n", ppmValue[0]);
 // 			printf("ppm value H2: %d \n", ppmValue[1]);
 // 			printf("ppm value NH3: %d \n", ppmValue[2]);

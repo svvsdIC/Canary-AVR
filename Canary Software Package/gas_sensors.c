@@ -43,7 +43,7 @@ void gas_sensors_init(void)
 {
 	volatile uint8_t sensor_id;
 	int16_t ADC_result;
-	
+	//
 	// Clear our error trackers
 	gas_sensor_initialization_errors=0; // Keeps track (by bit) of errors we've encountered.
 	gas_sensor_operational_errors=0;  // Keeps track (by bit) of errors we've encountered.
@@ -52,14 +52,10 @@ void gas_sensors_init(void)
 	get_gas_sensor_limits_from_EEPROM();
 	// This second cal is temporary and simply initializes the array to usable values...
 	get_gas_sensor_limits();
-	
+	//
 	// Enable the ADC
 	SetBit(ADCSRA, ADEN);
-	
-	
-	
-	
-	
+	//	
 	//Read initial value from the sensors
 	for(sensor_id = 0; sensor_id < 5; sensor_id++)
 	{
@@ -79,14 +75,6 @@ void gas_sensors_init(void)
 			SetBit(gas_sensor_initialization_errors,(sensor_id+3));  // If not, report an error
 		}		
 	}
-	
-
-	
-	
-	
-	
-	
-	
 	ClearBit(ADCSRA, ADEN);  //Disable the ADC until we go operational
 	// Report status via the LED that the gas sensors are ready (or not)
 	//display_status(gas_sensors, gas_sensor_initialization_errors);
@@ -98,7 +86,7 @@ void start_gas_sensor_read(void)
 	int16_t ADC_result;
 	volatile int16_t total;
 	int16_t gas_average;
-	
+	//
 	// Enable the ADC
 	SetBit(ADCSRA, ADEN);
 	//Read initial value from the sensors
@@ -141,7 +129,7 @@ void binary_search(int array[], int top, int bottom, int number) //return value 
 		{
 			valueOfIndex = mid + 1;
 		}
-		
+		//
 		// If element is smaller than mid, then
 		// it can only be present in left subarray
 		else if (number < array[mid])

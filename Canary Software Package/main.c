@@ -95,7 +95,7 @@ int main(void)
 	sei();
 	//
 	// Initialize and check the BME interface...
-//!	bme280basic_init();
+	bme280basic_init();
 	//
 	// Now that we've tried to initialize everything, we need to report status to the three LEDs sitting on
 	// the circuit board...the current placeholder routine does not do this so well.  Need to rethink this.
@@ -206,18 +206,18 @@ int main(void)
 			//
 			//============================
 			// Now read the BME interface...
-//! 		bme280basic_bulk_data_read();
+	 		bme280basic_bulk_data_read();
  			// Calculate the temperature and print it
-//!			tempCelsius = BME280_compensate_T_int32(rawTemp);
+			tempCelsius = BME280_compensate_T_int32(rawTemp);
 // 			sprintf(temperatureBuf, "%lu", tempCelsius);
 //  			printf("\nCelsius = %lu", tempCelsius);
 //			while(UART0TransmitInProgress) {}
  			// Calculate the pressure and print it
-//!			pressure = BME280_compensate_P_int64(rawPress);
+			pressure = BME280_compensate_P_int64(rawPress);
 // 			printf("\nPressure in Pa = %lu", pressure>>8);
 //			while(UART0TransmitInProgress) {}
  			// Calculate the humidity and print it
-//!			 humidity = bme280_compensate_H_int32(rawHum);
+			humidity = bme280_compensate_H_int32(rawHum);
 // 			printf("\nHumidity%% = %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
 //			while(UART0TransmitInProgress) {}
 // 			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb%.3s:%.4s:%.3s", temp, temp+2, pressure, humidity, time, time+2, time+4); //need key

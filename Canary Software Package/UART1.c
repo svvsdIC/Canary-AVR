@@ -169,6 +169,8 @@ ISR(USART1_RX_vect)
 					if (commaCount == 4)
 					{
 						startLong = i;
+						if (i>=25) {GPSlock=1;} else {GPSlock=0;}//Experiment
+						if (GPSlock=1) {SetBit(PORTB, PORTB2);}	else {ClearBit(PORTB, PORTB2);}
 					}
 					if (commaCount == 9)
 					{

@@ -57,7 +57,8 @@ void display_status(uint8_t subsystem, uint8_t status){
 }
 
 void canary_io_pin_initialization(void) {
-	// For Canary, Port B pins 0, 1, and 2 are the red, green, and blue LED feedback pins
+	// For Canary, Port B pins 0, 1, and 2 are the red, green, and blue LED control (output) pins
+	// Port B pin 3 is an input pin, so DDRB pin 3 should be set to zero.
 	DDRB  = 0x07;
 	//
 	// Set all LEDs off

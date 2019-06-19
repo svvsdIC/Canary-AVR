@@ -31,8 +31,6 @@ char String[]="Hello World!! The serial port is working!";
 extern char messageWant [UART1_RX_BUFFER_SIZE];
 volatile uint16_t seconds;
 uint8_t printType = 1;
-uint8_t GPSlock = 0; //flag to indicate if we're getting position data.
-
 
 //look up tables - taken from Aileen sensor order is: CO, H , NH3, CH4, O3
 
@@ -68,6 +66,7 @@ int main(void)
 	// Set a simple counter for the loop below.  Debug only.
 	seconds=0;
 	ItsTime=0;
+	GPSlock=0;
 	//
 	// set up our output for handling printf and string operations,,,
 	stdout = &mystdout;
@@ -108,7 +107,7 @@ int main(void)
 	// *** (and turn on the BLUE LED so the operator knows when it is locked).***
 	//
 	// Wait here for the start/standby button to be selected.. (PORTB pin 3).
-//	while(BitIsSet(PORTB,PORTB3)) {}//makes program wait until everything is ready(button is pushed) //not working we don't know why
+	while(BitIsSet(PINB,PINB3)) {}//makes program wait until everything is ready(button is pushed) //not working we don't know why
 	//
 	//Proceed to main loop with warning to ground system re: GPSlock
 	if (GPSlock==1) 

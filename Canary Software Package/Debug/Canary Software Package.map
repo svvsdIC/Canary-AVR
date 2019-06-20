@@ -1302,7 +1302,7 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x5670
+.debug_info     0x00000000     0x567b
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x792 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega1284p/avr51/crtatmega1284p.o
  .debug_info    0x00000792      0x6f7 adc.o
@@ -1314,9 +1314,9 @@ END GROUP
  .debug_info    0x00003ac6      0x6c7 timercounters.o
  .debug_info    0x0000418d      0x2aa TWI_Master.o
  .debug_info    0x00004437      0x82d UART0.o
- .debug_info    0x00004c64      0x8af UART1.o
- .debug_info    0x00005513       0xae C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega1284p/avr51\libatmega1284p.a(eerd_word.o)
- .debug_info    0x000055c1       0xaf C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega1284p/avr51\libatmega1284p.a(eerd_block.o)
+ .debug_info    0x00004c64      0x8ba UART1.o
+ .debug_info    0x0000551e       0xae C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega1284p/avr51\libatmega1284p.a(eerd_word.o)
+ .debug_info    0x000055cc       0xaf C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega1284p/avr51\libatmega1284p.a(eerd_block.o)
 
 .debug_abbrev   0x00000000     0x1772
  *(.debug_abbrev)
@@ -1363,7 +1363,7 @@ END GROUP
  .debug_frame   0x000006a0       0xa0 UART0.o
  .debug_frame   0x00000740       0xd0 UART1.o
 
-.debug_str      0x00000000      0xcd8
+.debug_str      0x00000000      0xce0
  *(.debug_str)
  .debug_str     0x00000000      0x296 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega1284p/avr51/crtatmega1284p.o
  .debug_str     0x00000296      0x428 adc.o
@@ -1384,8 +1384,8 @@ END GROUP
                                 0x297 (size before relaxing)
  .debug_str     0x00000b0f       0xe6 UART0.o
                                 0x535 (size before relaxing)
- .debug_str     0x00000bf5       0xe3 UART1.o
-                                0x568 (size before relaxing)
+ .debug_str     0x00000bf5       0xeb UART1.o
+                                0x570 (size before relaxing)
 
 .debug_loc      0x00000000     0x1ea6
  *(.debug_loc)

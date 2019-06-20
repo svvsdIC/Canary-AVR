@@ -15,19 +15,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 00000280  00000000  00000000  000086b8  2**3
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00005670  00000000  00000000  00008938  2**0
+  6 .debug_info   0000567b  00000000  00000000  00008938  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00001772  00000000  00000000  0000dfa8  2**0
+  7 .debug_abbrev 00001772  00000000  00000000  0000dfb3  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00001d4c  00000000  00000000  0000f71a  2**0
+  8 .debug_line   00001d4c  00000000  00000000  0000f725  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000810  00000000  00000000  00011468  2**2
+  9 .debug_frame  00000810  00000000  00000000  00011474  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000cd8  00000000  00000000  00011c78  2**0
+ 10 .debug_str    00000ce0  00000000  00000000  00011c84  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00001ea6  00000000  00000000  00012950  2**0
+ 11 .debug_loc    00001ea6  00000000  00000000  00012964  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000001b8  00000000  00000000  000147f6  2**0
+ 12 .debug_ranges 000001b8  00000000  00000000  0001480a  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -16268,6 +16268,7 @@ ISR(USART1_RX_vect)
     78e0:	df 93       	push	r29
     78e2:	ef 93       	push	r30
     78e4:	ff 93       	push	r31
+	static uint8_t LatSize;
 	unsigned char data;
 	unsigned char tmphead;
 	unsigned char i;
@@ -16309,11 +16310,11 @@ ISR(USART1_RX_vect)
     7918:	09 f0       	breq	.+2      	; 0x791c <__vector_28+0x60>
     791a:	7e c0       	rjmp	.+252    	; 0x7a18 <__vector_28+0x15c>
     791c:	e0 e0       	ldi	r30, 0x00	; 0
-					}
 					if (commaCount == 4)
 					{
 						startLong = i;
-						if (i>=25) {GPSlock=1;} else {GPSlock=0;}//Experiment
+						LatSize = startLong - startLat;
+						if (LatSize >=3) {GPSlock=1;} else {GPSlock=0;}//Experiment
 						if (GPSlock=1) {SetBit(PORTB, PORTB2);}	else {ClearBit(PORTB, PORTB2);}
     791e:	71 e0       	ldi	r23, 0x01	; 1
 		if (UART1_RxBuf[5] == 'G')
@@ -16364,7 +16365,8 @@ ISR(USART1_RX_vect)
 						startLong = i;
     7968:	90 93 9e 03 	sts	0x039E, r25	; 0x80039e <startLong+0x1>
     796c:	80 93 9d 03 	sts	0x039D, r24	; 0x80039d <startLong>
-						if (i>=25) {GPSlock=1;} else {GPSlock=0;}//Experiment
+						LatSize = startLong - startLat;
+						if (LatSize >=3) {GPSlock=1;} else {GPSlock=0;}//Experiment
 						if (GPSlock=1) {SetBit(PORTB, PORTB2);}	else {ClearBit(PORTB, PORTB2);}
     7970:	70 93 71 04 	sts	0x0471, r23	; 0x800471 <GPSlock>
     7974:	2a 9a       	sbi	0x05, 2	; 5

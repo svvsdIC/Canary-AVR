@@ -169,8 +169,19 @@ ISR(USART1_RX_vect)
 					if (commaCount == 4)
 					{
 						startLong = i;
-						if (i>=25) {GPSlock=1;} else {GPSlock=0;}//Experiment
-						if (GPSlock=1) {SetBit(PORTB, PORTB2);}	else {ClearBit(PORTB, PORTB2);}
+						// If the latitude data is longer than a character or two, we have GPS lock.  
+						// Test for it here, set a flag, and light the blue LED.
+						if ((startLong - startLat) >=3) 
+						{
+							GPSlock=1;
+							SetBit(PORTB, PORTB2);
+						} 
+						else 
+						// If lock is lost, clear the flag and clear the LED.
+						{
+							GPSlock=0;
+							ClearBit(PORTB, PORTB2);
+						}
 					}
 					if (commaCount == 9)
 					{
@@ -181,7 +192,7 @@ ISR(USART1_RX_vect)
 				{
 					latitude[i-startLat] = UART1_RxBuf[i+1];
 				}
-				if (commaCount == 2)
+				if (commaCount == 4)
 				{
 					longitude[i-startLong] = UART1_RxBuf[i+1];
 				}

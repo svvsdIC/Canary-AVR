@@ -1,26 +1,18 @@
 /********************************************************************************
  * UART0.c
  *
- * This set of functions implements an interrupt driven UART interface on
- * UART0 in an Atmel atmega324PA.  It has been tested @9600 baud, 8 data bits,
- * 1 stop bits, no parity, and no flow control on a chip with no external
- * crystal.  It should run much faster with a better clock source.
- * Based on Atmel's series "Getting Started with AVR" on Youtube.
- * In the Canary application, UART0 is a transmit only over a data radio.
- * To reduce chance of interrupt collisions, this version includes a flag to 
- * indicate when a large transmit is in progress, clearing the flag when it has
- * completed sending the string.
+ * This set of functions implements an interrupt driven UART interface
  *
  * Created: 3/19/2017 8:39:04 PM
- * Author: Canary Team
+ * Author: Canary SW Team
  *******************************************************************************/ 
 
 /********************************************************************************
 						Includes
 ********************************************************************************/
 #include "UART0.h"
-#include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <stdio.h>
 #include "canary_common.h"
 

@@ -1,14 +1,10 @@
 /********************************************************************************
  * UART0.h
  *
- * This set of functions implements an interrupt driven UART interface on
- * UART0 in an Atmel atmega324PA.  It has been tested @4800 baud, 8 data bits,
- * 2 stop bits, no parity, and no flow control on a chip with no external
- * crystal.  It should run much faster with a better clock source.
- * Based on Atmel's series "Getting Started with AVR" on Youtube.
+ * This set of functions implements an interrupt driven UART interface 
  *
  * Created: 3/19/2017 8:39:04 PM
- * Author: Craig R
+ * Author: Canary SW Team
  *******************************************************************************/ 
 
 #ifndef UART0_H_

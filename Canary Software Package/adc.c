@@ -6,7 +6,7 @@
  * for pointing the mux at different inputs.
  *
  * Created: 8/14/2017 2:33:20 PM
- * Author: Craig R
+ * Author: Canary SW Team
  *******************************************************************************/ 
 
 /********************************************************************************
@@ -62,9 +62,7 @@ void ADC_init(void)
 	// Enable the ADC
 	SetBit(ADCSRA, ADEN);
 	
-	// Enable the ADC interrupt
-	//*************TURNED OFF FOR LAB TESTING********************************
-	// SetBit(ADCSRA, ADIE);  // May have to turn this off for debug
+	SetBit(ADCSRA, ADIE);  // May have to turn this off for debug
 	
 	// Set Register ADCSRB to free running mode, single input mode (ADTS[2:0] = 0x00);
 	ADCSRB = 0x00;

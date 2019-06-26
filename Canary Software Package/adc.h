@@ -6,7 +6,7 @@
  * for pointing the mux at different inputs.
  *
  * Created: 8/14/2017 2:33:20 PM
- * Author: Craig R
+ * Author: Canary SW Team
  *******************************************************************************/ 
 #ifndef ADC_H_
 #define ADC_H_

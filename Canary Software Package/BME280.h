@@ -28,7 +28,7 @@
 /********************************************************************************
 						Global Variables
 ********************************************************************************/
-uint8_t BMEtriggerbyte; //, debugdata;
+uint8_t BMEtriggerbyte;
 long rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, humidity;
 /*long var1, var2, p;*/
 // Correction parameters for Temperature

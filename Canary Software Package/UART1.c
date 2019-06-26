@@ -12,17 +12,14 @@
  * the data collection sequence in main().
  *
  * Created: 3/19/2017 8:39:04 PM
- * Author: Canary Team
+ * Author: Canary SW Team
  *******************************************************************************/ 
 
 /********************************************************************************
 						Includes
 ********************************************************************************/
 #include "UART1.h"
-#include "canary_common.h"
-#include <avr/interrupt.h>
-#include <avr/io.h>
-#include <stdio.h>
+
 
 /********************************************************************************
 						Global Variables

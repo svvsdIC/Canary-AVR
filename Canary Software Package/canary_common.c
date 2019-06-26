@@ -2,16 +2,12 @@
  * canary_common.c
  *
  * Created: 11/15/2017 9:27:40 PM
- *  Author: craig
+ *  Author: Canary SW Team
  */ 
 
 /********************************************************************************
 						Includes
 ********************************************************************************/
-#include <avr/io.h>
-#include <stdlib.h>
-#include <util/delay.h>
-#include <avr/eeprom.h>
 #include "canary_common.h"
 #include "gas_sensors.h"
 #include "ADC.h"

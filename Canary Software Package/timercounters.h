@@ -8,7 +8,7 @@
  * card.  This latter interrupt is not needed in production.
  *
  * Created: 8/14/2017 1:52:26 PM
- * Author: Craig R
+ * Author: Canary SW Team
  *******************************************************************************/ 
  
 #ifndef TIMERCOUNTERS_H_
@@ -30,7 +30,6 @@
 /********************************************************************************
 						Macros and Defines
 ********************************************************************************/
-#define production // comment this out for development builds
 
 /********************************************************************************
 						Function Prototypes

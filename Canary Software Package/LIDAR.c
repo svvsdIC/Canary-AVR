@@ -13,7 +13,6 @@
 ********************************************************************************/
 #include "LIDAR.h"
 #include "TWI_Master.h"
-uint8_t testing;
 
 /********************************************************************************
 						Macros and Defines
@@ -51,7 +50,6 @@ uint16_t LIDAR_distance(void) {
 		while ( TWI_Transceiver_Busy() );	
 		// Now get the data we just read...note that it starts in messageBuf[1], not [0]
 		TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(messageBuf, 2);
-		testing = messageBuf[1]; //This is here for debug purposes
 	}
 	// return;
 	// LSB must now be low, so...

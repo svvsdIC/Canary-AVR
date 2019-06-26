@@ -5,7 +5,7 @@
  * on project Canary.  Copied from Morgan's code.
  * 
  * Created: 11/21/2017 3:12:47 PM
- *  Author:  Mostly Morgan
+ *  Author:  Canary SW Team
 ********************************************************************************/ 
 
 #ifndef LIDAR_H_

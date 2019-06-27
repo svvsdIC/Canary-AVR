@@ -19,7 +19,10 @@
 						Includes
 ********************************************************************************/
 #include "UART1.h"
-
+#include "canary_common.h"
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <stdio.h>
 
 /********************************************************************************
 						Global Variables

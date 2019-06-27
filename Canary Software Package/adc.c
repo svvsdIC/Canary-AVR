@@ -62,7 +62,7 @@ void ADC_init(void)
 	// Enable the ADC
 	SetBit(ADCSRA, ADEN);
 	
-	SetBit(ADCSRA, ADIE);  // May have to turn this off for debug
+	// SetBit(ADCSRA, ADIE);  // Only enable this if using background mode.  Current design is blocking mode.
 	
 	// Set Register ADCSRB to free running mode, single input mode (ADTS[2:0] = 0x00);
 	ADCSRB = 0x00;

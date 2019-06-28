@@ -8,7 +8,7 @@
  *
  *
  * Created: 5/11/2017 3:21:45 PM
- * Author : chen.morgan01
+ * Author : Canary SW Team
  ********************************************************************************/ 
 
 /********************************************************************************
@@ -20,16 +20,11 @@
 /********************************************************************************
 						Macros and Defines
 ********************************************************************************/
-volatile uint16_t temp1;
-
 /********************************************************************************
 						Global Variables
 ********************************************************************************/
 // These first few variables are here for debug purposes... ---UART STUFF
-uint8_t debugdata;
-char String[]="Hello World!! The serial port is working!";
 extern char messageWant [UART1_RX_BUFFER_SIZE];
-volatile uint16_t seconds;
 uint8_t printType = 1;
 
 //look up tables - taken from Aileen sensor order is: CO, H , NH3, CH4, O3
@@ -37,17 +32,6 @@ uint8_t printType = 1;
 /********************************************************************************
 						Functions
 ********************************************************************************/
-// void bme280_structure_and_device_init(void) {
-// 	dev.dev_id = BME280_I2C_ADDR_PRIM;
-// 	dev.intf = BME280_I2C_INTF;
-// 	dev.read = user_i2c_read;
-// 	dev.write = user_i2c_write;
-// 	// Call the HW initialization routine
-// 	rslt = bme280_init(&dev);
-// 	
-// }
-
-
 /********************************************************************************
 						Main
 ********************************************************************************/
@@ -64,7 +48,6 @@ int main(void)
 	// Turn on the RED LED until we have finished initialization
 	SetBit(PORTB, PORTB0);
 	// Set a simple counter for the loop below.  Debug only.
-	seconds=0;
 	ItsTime=0;
 	GPSlock=0;
 	//
@@ -73,7 +56,7 @@ int main(void)
 	//
 	// Initialize the timer counter 1 for 1Hz interrupt
 	// This interrupt is only enabled if we don't have the GPS sensor connected.
-	initialize_timer_counter_1();
+	//initialize_timer_counter_1();
 	//
 	// Initialize our main communication to the ground (UART0)
 	USART0_init(MYUBRR0);
@@ -119,9 +102,9 @@ int main(void)
 			printf("\n%s", "Proceeding without GPS lock");
 		} 
 	////////////////////////////////////////////////////////////////////////////
- 	// *************************************************************************
+ 	// 
  	// main loop
- 	// *************************************************************************
+ 	// 
 	while (1) 
     {
 		//////////////////////////////////////////////////////////
@@ -132,10 +115,8 @@ int main(void)
 		///////////////////////////////////////////////////////////
 		if (ItsTime == 1){ //wait for our 1Hz flag (from GPS or Interrupt)
 			ItsTime = 0; 
- 			seconds++;
-//  			printf("\nSeconds = %u", seconds);
+
 // 			// Wait until the transmission is complete
-// 			while(UART0TransmitInProgress) {}
 			// The next several lines sweep through ALL of the attached sensors and sends the data out the serial port.
 			// It is VERY simple at present:
 			// - Read each sensor
@@ -144,9 +125,7 @@ int main(void)
 			// - go to the next sensor 
 			//**********************************
 			// The GPS message triggers the whole collection cycle, so we can send it now...
-// 			printf("\n%s",messageWant);
 			while(UART0TransmitInProgress) {}
-			//REPLACE THE ABOVE DELAY WITH THE TRANSMIT COMPLETE FLAG WHILE STATEMENT
 			//
 			// For this simple approach, we should probably visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
@@ -167,79 +146,36 @@ int main(void)
 			//============================
 			 //Now test reading the LIDAR interface
 			distance = LIDAR_distance();
-//  			printf("\nLIDAR distance = %u", distance);
-// 			while(UART0TransmitInProgress) {}
-// 			printf("\n LiDAR message = http://canary.chordsrt.com/measurements/url_create?instrument_id=3&dist=%u&key=4e6fba7420ec9e881f510bcddb&", distance); //need key
-			// NOTE: Will need to change the write mechanism below to use the stdout (FILE stream). 
-// 			for (uint8_t i = 8; i<= 13; i++)//adds in time (***Index may be off by one to fix string problem.  Try starting at [7] to <=14)
-// 			{
-// 				USART0_TransmitByte(messageWant[i]);
-// 				time[i] = messageWant[i];
-// 				if (i%2 ==1)
-// 				{
-// 					printf(":");
-// 				}
-// 			}
-// 			printf("Z");
+ 			while(UART0TransmitInProgress) {}
 			//============================
 			// Now test the gas sensor interface...
 			start_gas_sensor_read();
 			// Note that this is a blocking read (stops all other activity)
 			// At present, the print statements are in that routine....
 			//...but the routine needs to be redesigned to operate in the background
-//  			printf("\nCarbon Monoxide = %u", raw_gas_vector[0]);
-//  			printf("\nHydrogen = %u", raw_gas_vector[1]);
-//  			printf("\nAmmonia = %u", raw_gas_vector[2]);
-//  			printf("\nMethane = %u", raw_gas_vector[3]);
-//  			printf("\nOzone = %u\n", raw_gas_vector[4]);
-//  			printf("\nCO = %u", raw_gas_vector[0]);
-// 			while(UART0TransmitInProgress) {}
-//  			printf("\nH = %u", raw_gas_vector[1]);
-// 			while(UART0TransmitInProgress) {}
-//  			printf("\nNA = %u", raw_gas_vector[2]);
-// 			while(UART0TransmitInProgress) {} 
-//  			printf("\nCH4 = %u", raw_gas_vector[3]);
-// 			while(UART0TransmitInProgress) {}
-//  			printf("\nO3 = %u", raw_gas_vector[4]);
-// 			while(UART0TransmitInProgress) {}
 			//
 			//============================
 			// Now read the BME interface...
 	 		bme280basic_bulk_data_read();
  			// Calculate the temperature and print it
 			tempCelsius = BME280_compensate_T_int32(rawTemp);
-// 			sprintf(temperatureBuf, "%lu", tempCelsius);
-//  			printf("\nCelsius = %lu", tempCelsius);
-//			while(UART0TransmitInProgress) {}
  			// Calculate the pressure and print it
 			pressure = BME280_compensate_P_int64(rawPress);
-// 			printf("\nPressure in Pa = %lu", pressure>>8);
-//			while(UART0TransmitInProgress) {}
  			// Calculate the humidity and print it
 			humidity = bme280_compensate_H_int32(rawHum);
-// 			printf("\nHumidity%% = %lu.%lu\n", humidity>>10, ((humidity*1000)>>10));
-//			while(UART0TransmitInProgress) {}
-// 			printf("\n BME message = http://canary.chordsrt.com/measurements/url_create?instrument_id=1&temp=%.5s.%.5s&pres=%lu&hum=%lu&key=4e6fba7420ec9e881f510bcddb%.3s:%.4s:%.3s", temp, temp+2, pressure, humidity, time, time+2, time+4); //need key
 			//
 			//============================
 			
 			for(int i = 0; i < 5; i++)
 			{
-				convert_to_ppm(i); //only works for co right now
+				convert_to_ppm(i); 
 			}
-// 			printf("ppm value CO: %d \n", ppmValue[0]);
-// 			printf("ppm value H2: %d \n", ppmValue[1]);
-// 			printf("ppm value NH3: %d \n", ppmValue[2]);
-// 			printf("ppm value CH4: %d \n", ppmValue[3]);
-// 			printf("ppm value O3: %d \n", ppmValue[4]);
-// 			while(UART0TransmitInProgress) {}
-
 			//print statements
 			// ----------- debug -------------- //
 			if (printType == 0)
 			{
 				//# seconds
-				printf("\nSeconds = %u", seconds);
+				//printf("\nSeconds = %u", seconds);
 				// LiDAR
 				while(UART0TransmitInProgress) {}
  				printf("\nLIDAR distance = %u", distance);

@@ -2,7 +2,7 @@
  * canary_common.h
  * Common definitions for the Canary project
  * Created: 11/15/2017 8:37:17 PM
- *  Author: Craig
+ *  Author: Canary SW Team
  */ 
 #ifndef CANARY_COMMON_H_
 #define CANARY_COMMON_H_
@@ -17,11 +17,10 @@
 ********************************************************************************/
 #include <avr/io.h>		// Contains the standard IO definitions
 #include <avr/interrupt.h>  // Required for interrupt processing
-#include <stdio.h>	// Required for UART routines
+//#include <stdio.h>	// Required for UART routines
 #include <avr/eeprom.h>  // Required for reading presets from EEPROM
-#include <avr/power.h>  // Required for minimizing power consumption
-#include <stdlib.h>  //Need to see if this is needed.
-#include <util/delay.h>  // Used for debug.  May not need in production
+//#include <avr/power.h>  // Required for minimizing power consumption
+//#include <util/delay.h>  // Used for debug.  May not need in production, reinclude for debug
 #include <string.h>  //Req'd for formatting strings to send to ground
 #include "timercounters.h"  // Timer and counter routines and initialization
 #include "UART0.h"  // UART routines and initialization - radio interface
@@ -29,7 +28,6 @@
 #include "adc.h"   // Analog to digital routines and initialization
 #include "gas_sensors.h"	//Several routines for talking to the gas sensors.
 #include "TWI_Master.h"   // I2C routines and initialization
-#include "RGBsensor.h"  // Not needed for production - here to test I2C
 #include "LIDAR.h"	//LIDAR specific routines
 #include "BME280.h" //BME code
 

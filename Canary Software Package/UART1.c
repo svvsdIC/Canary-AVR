@@ -185,18 +185,18 @@ ISR(USART1_RX_vect)
 					}
 					if (commaCount == 9)
 					{
-						startLong = i;
+						startAlt = i;
 					}
 				}
-				if (commaCount == 2)
+				if (commaCount == 2) //store each new character after seconds comma
 				{
 					latitude[i-startLat] = UART1_RxBuf[i+1];
 				}
-				if (commaCount == 4)
+				if (commaCount == 4) //after fourth comma
 				{
 					longitude[i-startLong] = UART1_RxBuf[i+1];
 				}
-				if (commaCount == 9)
+				if (commaCount == 9) //and ninth comma
 				{
 					altitude[i-startAlt] = UART1_RxBuf[i+1];
 				}

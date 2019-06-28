@@ -273,11 +273,11 @@ long BME280_compensate_T_int32(long adc_T) {
 long BME280_compensate_P_int64(long adc_P)
 {
 	long long var1, var2, p;
-	var1 = ((long)t_fine)-128000;
-	var2 = var1*var1*(long)dig_P6;
-	var2 = var2 + ((var1*(long)dig_P5)<<17);
+	var1 = ((long long)t_fine)-128000;
+	var2 = var1*var1*(long long)dig_P6;
+	var2 = var2 + ((var1*(long long)dig_P5)<<17);
 	var2 = var2 + (((long long)dig_P4)<<35);
-	var1 = ((var1*var1*(long)dig_P3)>>8)+((var1*(long)dig_P2)<<12);
+	var1 = ((var1*var1*(long long)dig_P3)>>8)+((var1*(long long)dig_P2)<<12);
 	var1 = (((((long long)1)<<47)+var1))*((long long)dig_P1)>>33;
 	if (var1 == 0)
 	{
@@ -285,9 +285,9 @@ long BME280_compensate_P_int64(long adc_P)
 	}
 	p = 1048576 - adc_P;
 	p = (((p<<31)-var2)*3125)/var1;
-	var1 = (((long)dig_P9)*(p>>13)*(p>>13))>>25;
-	var2 = (((long)dig_P8)*p)>>19;
-	p = ((p+var1+var2)>>8)+(((long)dig_P7)<<4);
+	var1 = (((long long)dig_P9)*(p>>13)*(p>>13))>>25;
+	var2 = (((long long)dig_P8)*p)>>19;
+	p = ((p+var1+var2)>>8)+(((long long)dig_P7)<<4);
 	return(long)p;
 }
 

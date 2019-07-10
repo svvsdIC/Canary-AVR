@@ -159,16 +159,16 @@ ISR(USART1_RX_vect)
 			for (i = 0; i<= tmphead; i++)
 			{
 				messageWant[i] = UART1_RxBuf[i+1]; //UART1_RxBuf[i];
-				if(UART1_RxBuf[i+1] == ',')
+				if(UART1_RxBuf[i] == ',')
 				{
 					commaCount = commaCount + 1;
 					if (commaCount == 2)
 					{
-						startLat = i;
+						startLat = i+1;
 					}
 					if (commaCount == 4)
 					{
-						startLong = i;
+						startLong = i+1;
 						// If the latitude data is longer than a character or two, we have GPS lock.  
 						// Test for it here, set a flag, and light the blue LED.
 						if ((startLong - startLat) >=3) 
@@ -185,20 +185,23 @@ ISR(USART1_RX_vect)
 					}
 					if (commaCount == 9)
 					{
-						startAlt = i;
+						startAlt = i+1;
 					}
 				}
-				if (commaCount == 2) //store each new character after seconds comma
+				else
 				{
-					latitude[i-startLat] = UART1_RxBuf[i+1];
-				}
-				if (commaCount == 4) //after fourth comma
-				{
-					longitude[i-startLong] = UART1_RxBuf[i+1];
-				}
-				if (commaCount == 9) //and ninth comma
-				{
-					altitude[i-startAlt] = UART1_RxBuf[i+1];
+					if (commaCount == 2) //store each new character after seconds comma
+					{
+						latitude[i-startLat] = UART1_RxBuf[i];
+					}
+					if (commaCount == 4) //after fourth comma
+					{
+						longitude[i-startLong] = UART1_RxBuf[i];
+					}
+					if (commaCount == 9) //and ninth comma
+					{
+						altitude[i-startAlt] = UART1_RxBuf[i];
+					}
 				}
 
 			}

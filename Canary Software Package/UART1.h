@@ -43,9 +43,9 @@
 						Global Variables
 ********************************************************************************/
 char latitude [9];
-char longitude [10];
 char altitude [8];
 uint8_t GPSlock; //flag to indicate if we're getting position data.
+char longitude [12];
 
 /********************************************************************************
 						Function Prototypes

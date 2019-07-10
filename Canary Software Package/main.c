@@ -224,7 +224,13 @@ int main(void)
 				printf("1,%d.%.2d,%d,%d|", (int) (tempCelsius/100), (int) (tempCelsius%100), pressure>>8, humidity>>10);
 				printf("2,%d,%d,%d,%d,%d,%d|", raw_gas_vector[0], raw_gas_vector[1], raw_gas_vector[2], raw_gas_vector[3], raw_gas_vector[4], raw_gas_vector[5]);
 				printf("3,%d|",distance);
-				printf("4,%d,%d,%d|",latitude,longitude,altitude);
+				printf("4,");
+				printf(latitude);
+				printf(",");
+				printf(longitude);
+				printf(",");
+				printf(altitude);
+				printf("|");
 			}
 			//re-enable the GPS receiver & interrupt after processing all sensor data
 			UCSR1B |= ((1<<RXCIE1)|(1<<RXEN1));

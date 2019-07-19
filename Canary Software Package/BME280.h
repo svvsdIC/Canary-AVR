@@ -28,24 +28,29 @@
 /********************************************************************************
 						Global Variables
 ********************************************************************************/
-uint8_t BMEtriggerbyte;
-long rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, humidity;
+int32_t rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, humidity;
 /*long var1, var2, p;*/
 // Correction parameters for Temperature
 uint16_t dig_T1;
-short dig_T2, dig_T3;
-char temperatureBuf [20];
-char time [6];
+int16_t dig_T2, dig_T3;
+uint8_t temperatureBuf [20];
+uint8_t time [6];
 // Correction parameters for Pressure
 uint16_t dig_P1;
-short dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
+int16_t dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
 // correction parameters for humidity
-uint16_t dig_H1, dig_H3;
-short dig_H2, dig_H4, dig_H5, dig_H6;
+uint8_t dig_H1, dig_H3;
+int16_t dig_H2, dig_H4, dig_H5;
+int8_t dig_H6;
 // This variable starts the data collection loop in main
 extern volatile uint8_t ItsTime;
 // To test basic functionality of the BME280...
-unsigned char BMEmessageBuf[TWI_BUFFER_SIZE], RawBMEdata[40];
+uint8_t BMEmessageBuf[TWI_BUFFER_SIZE], RawBMEdata[40];
+
+// We want Temperature oversampling set to x1 (ctrl_meas (0xF4) [7:5] = 0b001)
+// We want Pressure oversampling set to x8 (ctrl_meas (0xF4) [4:2] = 0b100)
+// Put the device into Forced mode (we want to tell the device to "go measure") (ctrl_meas (0xF4) [1:0] = 0b01)
+#define BMEtriggerbyte (0b01<<5) | (0b100<<2) | (0b01<<0)
 
 /********************************************************************************
 						Function Prototypes
@@ -56,10 +61,10 @@ void bme280basic_init(void);
 
 void bme280basic_bulk_data_read(void);
 
-long BME280_compensate_T_int32(long adc_T);
+int32_t BME280_compensate_T_int32(long adc_T);
 
-long BME280_compensate_P_int64(long adc_P);
+int32_t BME280_compensate_P_int64(long adc_P);
 
-long bme280_compensate_H_int32(long adc_H);
+uint32_t bme280_compensate_H_int32(long adc_H);
 
 #endif /* BME280_H*/

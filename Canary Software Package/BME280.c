@@ -22,12 +22,6 @@
 void BME_read_correction_coefficients(void) {
 	// This routine (will) reads the corrective coefficients for temperature, pressure, and humidity...
 	static uint8_t i;
-	// 	// Just reading temperature for now...
-	// 	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
-	// 	BMEmessageBuf[1] = 0x88; // The register we want to start reading from
-	/*	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2);*/
-	// Let initialization transaction complete...
-	/*	while ( TWI_Transceiver_Busy() );*/
 	static volatile uint8_t BMEbusy = 1;
 	while (BMEbusy) {
 		BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
@@ -37,7 +31,7 @@ void BME_read_correction_coefficients(void) {
 		while ( TWI_Transceiver_Busy() );
 		// Bytes to read = (number_of_bytes_to_read (on next cycle) +1).
 		BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
-		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 26); //We want one bytes back, so use 2 in the function call.
+		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 26); 
 		// Let initialization transaction complete...
 		while ( TWI_Transceiver_Busy() );
 		// Copy the data we want...
@@ -176,10 +170,7 @@ void bme280basic_init(void) {
 		while ( TWI_Transceiver_Busy() );
 		//
 		BME_read_correction_coefficients();
-		// We want Temperature oversampling set to x1 (ctrl_meas (0xF4) [7:5] = 0b001)
-		// We want Pressure oversampling set to x8 (ctrl_meas (0xF4) [4:2] = 0b100)
-		// Put the device into Forced mode (we want to tell the device to "go measure") (ctrl_meas (0xF4) [1:0] = 0b01)
-		BMEtriggerbyte = (0b01<<5) | (0b100<<2) | (0b01<<0);
+
 		// NOTE: THIS BYTE MUST BE RESENT EACH TIME TO GET A NEW MEASUREMENT
 		BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
 		BMEmessageBuf[1] = 0xF4; // The register we want to write to
@@ -245,11 +236,10 @@ void bme280basic_bulk_data_read(void) {
 	// We want Temperature oversampling set to x1 (ctrl_meas (0xF4) [7:5] = 0b001)
 	// We want Pressure oversampling set to x8 (ctrl_meas (0xF4) [4:2] = 0b100)
 	// Put the device into Forced mode (we want to tell the device to "go measure") (ctrl_meas (0xF4) [1:0] = 0b01)
-	// BMEtriggerbyte ^= 0x03; // toggle the forced mode (not sure this is required)
 	// NOTE: THIS BYTE MUST BE RESENT EACH TIME TO GET A NEW MEASUREMENT
 	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
 	BMEmessageBuf[1] = 0xF4; // The register we want to write to
-	BMEmessageBuf[2] = (0b01<<5) | (0b100<<2) | (0b01<<0); // Set temp, pressure, and mode
+	BMEmessageBuf[2] = BMEtriggerbyte; // Set temp, pressure, and mode
 	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 3);
 	// Wait for the transaction to complete...
 	while ( TWI_Transceiver_Busy() );
@@ -258,8 +248,8 @@ void bme280basic_bulk_data_read(void) {
 
 // Returns temperature in DegC, resolution is 0.01 DegC. Output value of ?5123? equals 51.23 Deg C.
 // t_fine carries fine temperature as global value
-long BME280_compensate_T_int32(long adc_T) {
-	long var1, var2, T;
+int32_t BME280_compensate_T_int32(int32_t adc_T) {
+	int32_t var1, var2, T;
 	var1  = ((((adc_T>>3) - (dig_T1<<1))) * (dig_T2)) >> 11;
 	var2  = (((((adc_T>>4) - (dig_T1)) * ((adc_T>>4) - (dig_T1))) >> 12) * (dig_T3)) >> 14;
 	t_fine = var1 + var2;
@@ -270,39 +260,39 @@ long BME280_compensate_T_int32(long adc_T) {
 
 //Return pressure in Pa as unsigned 32 bit int in Q24.8 format(24 int bits, 8 fractional)
 //Output value of "24674867" represents 24674867/256 = 96386.2 Pa = 963.862 hPa
-long BME280_compensate_P_int64(long adc_P)
+int32_t BME280_compensate_P_int64(int32_t adc_P)
 {
-	long long var1, var2, p;
-	var1 = ((long long)t_fine)-128000;
-	var2 = var1*var1*(long long)dig_P6;
-	var2 = var2 + ((var1*(long long)dig_P5)<<17);
-	var2 = var2 + (((long long)dig_P4)<<35);
-	var1 = ((var1*var1*(long long)dig_P3)>>8)+((var1*(long long)dig_P2)<<12);
-	var1 = (((((long long)1)<<47)+var1))*((long long)dig_P1)>>33;
+	int64_t var1, var2, p;
+	var1 = ((int64_t)t_fine)-128000;
+	var2 = var1*var1*(int64_t)dig_P6;
+	var2 = var2 + ((var1*(int64_t)dig_P5)<<17);
+	var2 = var2 + (((int64_t)dig_P4)<<35);
+	var1 = ((var1*var1*(int64_t)dig_P3)>>8)+((var1*(int64_t)dig_P2)<<12);
+	var1 = (((((int64_t)1)<<47)+var1))*((int64_t)dig_P1)>>33;
 	if (var1 == 0)
 	{
 		return 0;
 	}
 	p = 1048576 - adc_P;
 	p = (((p<<31)-var2)*3125)/var1;
-	var1 = (((long long)dig_P9)*(p>>13)*(p>>13))>>25;
-	var2 = (((long long)dig_P8)*p)>>19;
-	p = ((p+var1+var2)>>8)+(((long long)dig_P7)<<4);
-	return(long)p;
+	var1 = (((int64_t)dig_P9)*(p>>13)*(p>>13))>>25;
+	var2 = (((int64_t)dig_P8)*p)>>19;
+	p = ((p+var1+var2)>>8)+(((int64_t)dig_P7)<<4);
+	return(int32_t)p;
 }
 
 // Returns humidity in %RH as unsigned 32 bit integer in Q22.10 format (22 integer and 10 fractional bits).
 // Output value of ?47445? represents 47445/1024 = 46.333 %RH
-long bme280_compensate_H_int32(long adc_H)
+uint32_t bme280_compensate_H_int32(int32_t adc_H)
 {
-	long long v_x1_u32r;
-	v_x1_u32r = (t_fine - ((long long)76800));
-	v_x1_u32r = (((((adc_H << 14) - (((long long)dig_H4) << 20) - (((long long)dig_H5) * v_x1_u32r)) +
-	((long long)16384)) >> 15) * (((((((v_x1_u32r * ((long long)dig_H6)) >> 10) * (((v_x1_u32r *
-	((long long)dig_H3)) >> 11) + ((long long)32768))) >> 10) + ((long long)2097152)) *
-	((long long)dig_H2) + 8192) >> 14));
-	v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((long long)dig_H1)) >> 4));
+	int32_t v_x1_u32r;
+	v_x1_u32r = (t_fine - ((int32_t)76800));
+	v_x1_u32r = (((((adc_H << 14) - (((int32_t)dig_H4) << 20) - (((int32_t)dig_H5) * v_x1_u32r)) +
+	((int32_t)16384)) >> 15) * (((((((v_x1_u32r * ((int32_t)dig_H6)) >> 10) * (((v_x1_u32r *
+	((int32_t)dig_H3)) >> 11) + ((int32_t)32768))) >> 10) + ((int32_t)2097152)) *
+	((int32_t)dig_H2) + 8192) >> 14));
+	v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((int32_t)dig_H1)) >> 4));
 	v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
 	v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
-	return (long)(v_x1_u32r>>12);
+	return (uint32_t)(v_x1_u32r>>12);
 }

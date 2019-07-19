@@ -161,8 +161,11 @@ int main(void)
 			tempCelsius = BME280_compensate_T_int32(rawTemp);
  			// Calculate the pressure and print it
 			pressure = BME280_compensate_P_int64(rawPress);
+			//Actual pressure calculation in Pa (FROM DATASHEET)
+			pressure = pressure >> 8;
  			// Calculate the humidity and print it
 			humidity = bme280_compensate_H_int32(rawHum);
+			
 			//
 			//============================
 			
@@ -221,7 +224,10 @@ int main(void)
 			Order: lat, long, altitude */
 			if (printType == 1)
 			{
-				printf("1,%d.%.2d,%d,%d|", (int) (tempCelsius/100), (int) (tempCelsius%100), pressure>>8, humidity>>10);
+				printf("1,%d.%.2d", (int) (tempCelsius/100), (int) (tempCelsius%100));
+				printf(",%lu", pressure);
+				printf(",%u", humidity>>10);
+				printf("|");
 				printf("2,%d,%d,%d,%d,%d,%d|", raw_gas_vector[0], raw_gas_vector[1], raw_gas_vector[2], raw_gas_vector[3], raw_gas_vector[4], raw_gas_vector[5]);
 				printf("3,%d|",distance);
 				printf("4,");

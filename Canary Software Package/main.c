@@ -228,7 +228,7 @@ int main(void)
 				printf(",%lu", pressure);
 				printf(",%u", humidity>>10);
 				printf("|");
-				printf("2,%d,%d,%d,%d,%d,%d|", raw_gas_vector[0], raw_gas_vector[1], raw_gas_vector[2], raw_gas_vector[3], raw_gas_vector[4], raw_gas_vector[5]);
+				printf("2,%d,%d,%d,%d,%d|", raw_gas_vector[0], raw_gas_vector[1], raw_gas_vector[2], raw_gas_vector[3], raw_gas_vector[4] /*, raw_gas_vector[5]*/);
 				printf("3,%d|",distance);
 				printf("4,");
 				printf(latitude);

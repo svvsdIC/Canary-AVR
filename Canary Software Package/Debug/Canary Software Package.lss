@@ -780,27 +780,27 @@ void BME_read_correction_coefficients(void) {
      4d8:	80 93 6b 02 	sts	0x026B, r24	; 0x80026b <i.2131>
 		RawBMEdata[i] = BMEmessageBuf[i+1];
 	}
-	dig_H2 = RawBMEdata[1] | (RawBMEdata[2]<<8);
+	dig_H2 = RawBMEdata[0] | (RawBMEdata[1]<<8);
      4dc:	e4 ed       	ldi	r30, 0xD4	; 212
      4de:	f3 e0       	ldi	r31, 0x03	; 3
-     4e0:	82 81       	ldd	r24, Z+2	; 0x02
+     4e0:	81 81       	ldd	r24, Z+1	; 0x01
      4e2:	90 e0       	ldi	r25, 0x00	; 0
      4e4:	98 2f       	mov	r25, r24
      4e6:	88 27       	eor	r24, r24
-     4e8:	21 81       	ldd	r18, Z+1	; 0x01
+     4e8:	20 81       	ld	r18, Z
      4ea:	82 2b       	or	r24, r18
      4ec:	90 93 88 04 	sts	0x0488, r25	; 0x800488 <dig_H2+0x1>
      4f0:	80 93 87 04 	sts	0x0487, r24	; 0x800487 <dig_H2>
-	dig_H3 = RawBMEdata[3];
-     4f4:	83 81       	ldd	r24, Z+3	; 0x03
+	dig_H3 = RawBMEdata[2];
+     4f4:	82 81       	ldd	r24, Z+2	; 0x02
      4f6:	80 93 7e 04 	sts	0x047E, r24	; 0x80047e <dig_H3>
-	dig_H4 = (RawBMEdata[4]<<4) | (RawBMEdata[5]>>5);
-     4fa:	85 81       	ldd	r24, Z+5	; 0x05
+	dig_H4 = (RawBMEdata[3]<<4) | (RawBMEdata[4]>>5);
+     4fa:	84 81       	ldd	r24, Z+4	; 0x04
      4fc:	82 95       	swap	r24
      4fe:	86 95       	lsr	r24
      500:	87 70       	andi	r24, 0x07	; 7
      502:	90 e0       	ldi	r25, 0x00	; 0
-     504:	24 81       	ldd	r18, Z+4	; 0x04
+     504:	23 81       	ldd	r18, Z+3	; 0x03
      506:	40 e1       	ldi	r20, 0x10	; 16
      508:	24 9f       	mul	r18, r20
      50a:	90 01       	movw	r18, r0
@@ -809,8 +809,8 @@ void BME_read_correction_coefficients(void) {
      510:	39 2b       	or	r19, r25
      512:	30 93 d1 03 	sts	0x03D1, r19	; 0x8003d1 <dig_H4+0x1>
      516:	20 93 d0 03 	sts	0x03D0, r18	; 0x8003d0 <dig_H4>
-	dig_H5 = (RawBMEdata[5]>>5) | (RawBMEdata[6]<<4);
-     51a:	26 81       	ldd	r18, Z+6	; 0x06
+	dig_H5 = (RawBMEdata[4]>>5) | (RawBMEdata[5]<<4);
+     51a:	25 81       	ldd	r18, Z+5	; 0x05
      51c:	40 e1       	ldi	r20, 0x10	; 16
      51e:	24 9f       	mul	r18, r20
      520:	90 01       	movw	r18, r0
@@ -819,8 +819,8 @@ void BME_read_correction_coefficients(void) {
      526:	93 2b       	or	r25, r19
      528:	90 93 7c 04 	sts	0x047C, r25	; 0x80047c <dig_H5+0x1>
      52c:	80 93 7b 04 	sts	0x047B, r24	; 0x80047b <dig_H5>
-	dig_H6 = RawBMEdata[7];
-     530:	87 81       	ldd	r24, Z+7	; 0x07
+	dig_H6 = RawBMEdata[6];
+     530:	86 81       	ldd	r24, Z+6	; 0x06
      532:	80 93 21 04 	sts	0x0421, r24	; 0x800421 <dig_H6>
 }
      536:	df 91       	pop	r29
@@ -15380,7 +15380,7 @@ uint16_t LIDAR_distance(void) {
     7300:	8c e7       	ldi	r24, 0x7C	; 124
     7302:	90 e0       	ldi	r25, 0x00	; 0
     7304:	a0 d4       	rcall	.+2368   	; 0x7c46 <putchar>
-				printf("2,%d,%d,%d,%d,%d|", raw_gas_vector[0], raw_gas_vector[1], raw_gas_vector[2], raw_gas_vector[3], raw_gas_vector[4] /*, raw_gas_vector[5]*/);
+				printf("2,%d,%d,%d,%d,%d|", raw_gas_vector[0], raw_gas_vector[1], raw_gas_vector[2], raw_gas_vector[3], raw_gas_vector[4]);
     7306:	89 85       	ldd	r24, Y+9	; 0x09
     7308:	8f 93       	push	r24
     730a:	88 85       	ldd	r24, Y+8	; 0x08

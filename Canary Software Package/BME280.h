@@ -29,6 +29,7 @@
 						Global Variables
 ********************************************************************************/
 int32_t rawPress, rawTemp, rawHum, t_fine, tempCelsius, pressure, humidity;
+/*long var1, var2, p;*/
 // Correction parameters for Temperature
 uint16_t dig_T1;
 int16_t dig_T2, dig_T3;

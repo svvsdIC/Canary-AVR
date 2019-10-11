@@ -31,11 +31,11 @@ void BME_read_correction_coefficients(void) {
 		while ( TWI_Transceiver_Busy() );
 		// Bytes to read = (number_of_bytes_to_read (on next cycle) +1).
 		BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
-		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 2); 
+		TWI_Start_Transceiver_With_Data( BMEmessageBuf, 26); 
 		// Let initialization transaction complete...
 		while ( TWI_Transceiver_Busy() );
 		// Copy the data we want...
-		TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 2);
+		TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 26);
 		// CHeck to see if things are still busy
 		BMEbusy = ((0b00001000 & BMEmessageBuf[1])>>3);
 	}
@@ -81,7 +81,7 @@ void BME_read_correction_coefficients(void) {
 	dig_P7 = RawBMEdata[18] | (RawBMEdata[19]<<8);
 	dig_P8 = RawBMEdata[20] | (RawBMEdata[21]<<8);
 	dig_P9 = RawBMEdata[22] | (RawBMEdata[23]<<8);
-	dig_H1 = RawBMEdata[25]; 
+	dig_H1 = RawBMEdata[25];
 	//Now grab the rest of the humidity sensor data
 	BMEmessageBuf[0] = BME_WRITE_ADDRESS; // The first byte must always have TWI slave address.
 	BMEmessageBuf[1] = 0xE1; // The register we want to start reading from
@@ -91,16 +91,16 @@ void BME_read_correction_coefficients(void) {
 	// Now for the read part...
 	// Bytes to read = (number_of_bytes_to_read (on next cycle) +1). Zero origin.   If we want to read eight bytes, we pass "9".
 	BMEmessageBuf[0] = BME_READ_ADDRESS; // The first byte must always have TWI slave address.
-	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 9); //We want eight bytes back, so use 9 in the function call.
+	TWI_Start_Transceiver_With_Data( BMEmessageBuf, 8); //We want eight bytes back, so use 9 in the function call.
 	// Let initialization transaction complete...
 	while ( TWI_Transceiver_Busy() );
 	// Now get the data we just read...note this call just copies the data from the TWI routine buffer to our local buffer (BMEmessageBuf)...
-	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 9);
+	TWI_XFER_STATUS = TWI_Get_Data_From_Transceiver(BMEmessageBuf, 8);
 	// Note that the data we want starts in BMEmessageBuf[1], not BMEmessageBuf[0]
 	// Transfer the data to a variable we can manipulate to get our data out...
 	for (i=0;i<7;i++) 	{
 		RawBMEdata[i] = BMEmessageBuf[i+1];
-	} //Check the following with the data sheet section 4.2.2. ******************** I changed the index by 1 on the following.
+	}
 	dig_H2 = RawBMEdata[0] | (RawBMEdata[1]<<8);
 	dig_H3 = RawBMEdata[2];
 	dig_H4 = (RawBMEdata[3]<<4) | (RawBMEdata[4]>>5);

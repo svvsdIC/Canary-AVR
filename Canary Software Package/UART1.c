@@ -182,6 +182,12 @@ ISR(USART1_RX_vect)
 							GPSlock=0;
 							ClearBit(PORTB, PORTB2);
 						}
+						//Add whether or not the GPS is getting data before start is pressed
+						//if(waiting== 1)
+						{
+							printf("0,%d|",GPSlock);
+						}
+						
 					}
 					if (commaCount == 9)
 					{
@@ -209,6 +215,7 @@ ISR(USART1_RX_vect)
  			UCSR1B &= !((1<<RXCIE1)|(1<<RXEN1));  //Clear the receive interrupt on USART 1 until we're done reading all other sensors.
  			ItsTime = 1;
  			ToggleBit(PORTB, PORTB1);
+
 		}
 		UART1_RxTail = 0;
 		UART1_RxHead = 0;

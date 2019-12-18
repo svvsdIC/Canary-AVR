@@ -26,7 +26,6 @@
 // These first few variables are here for debug purposes... ---UART STUFF
 extern char messageWant [UART1_RX_BUFFER_SIZE];
 uint8_t printType = 1;
-
 //look up tables - taken from Aileen sensor order is: CO, H , NH3, CH4, O3
 
 /********************************************************************************
@@ -85,28 +84,32 @@ int main(void)
 	//
 	// Clear the Red LED to indicate all things are initialized.
 	ClearBit(PORTB, PORTB0);
+	//Start sending GPS lock before everything else is established
+	waiting = 1;
 	//
 	// ***modify UART1 interrupt code to set the GPSlock flag is distance data is detected ***
 	// *** (and turn on the BLUE LED so the operator knows when it is locked).***
 	//
 	// Wait here for the start/standby button to be selected.. (PORTB pin 3).
+	
 	while(BitIsSet(PINB,PINB3)) {}//makes program wait until everything is ready(button is pushed) //not working we don't know why
 	//
 	//Proceed to main loop with warning to ground system re: GPSlock
-	if (GPSlock==1) 
-		{
-			printf("\n%s", "Proceeding with GPS lock");
-		}
-		else
-		{
-			printf("\n%s", "Proceeding without GPS lock");
-		} 
+// 	if (GPSlock==1) 
+// 		{
+// 			printf("\n%s", "Proceeding with GPS lock");
+// 		}
+// 		else
+// 		{
+// 			printf("\n%s", "Proceeding without GPS lock");
+// 		} 
 	////////////////////////////////////////////////////////////////////////////
  	// 
  	// main loop
  	// 
 	while (1) 
     {
+		waiting = 0;
 		//////////////////////////////////////////////////////////
 		// reached steady state...do nothing for the moment - wait for interrupts.
 		// The variable ItsTime gets set to 1 every second using the 1Hz interrupt
@@ -116,7 +119,7 @@ int main(void)
 		if (ItsTime == 1){ //wait for our 1Hz flag (from GPS or Interrupt)
 			ItsTime = 0; 
 
-// 			// Wait until the transmission is complete
+ 			// Wait until the transmission is complete
 			// The next several lines sweep through ALL of the attached sensors and sends the data out the serial port.
 			// It is VERY simple at present:
 			// - Read each sensor

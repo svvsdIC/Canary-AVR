@@ -81,6 +81,8 @@ volatile uint8_t ItsTime;
 static FILE mystdout = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_WRITE);
 // This sets up a flag to indicate when USART0 is busy sending a large string.
 static uint8_t UART0TransmitInProgress;
+
+static volatile uint8_t waiting;
 /********************************************************************************
 						Function Prototypes
 ********************************************************************************/

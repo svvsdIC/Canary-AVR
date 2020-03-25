@@ -152,7 +152,7 @@ void convert_to_ppm(uint8_t sensor_id)
 {
 	int VALS_TO_MULTIPLY[6] = {9, 6, 10, 8, 7}; // values for multiplication (powers of two)
 	int R0_VALS_GAS_SENSORS[6] = {381, 508, 308, 405, 38, 0}; //all R0 values. We may have a 6th sensor but it is currently not in existence
-	int R0_RATIOS_CO[6][2][128] = {/*format is {Ratios},{actual PPM values}, order is {CO, H2, NH3, CH4, O3} */
+	int R0_RATIOS[6][2][128] = {/*format is {Ratios},{actual PPM values}, order is {CO, H2, NH3, CH4, O3} */
 		{{11734,3908,2616,2035,1694,1466,1301,1176,1077,996,928,871,822,779,741,707,677,650,626,603,583,564,546,530,515,508,494,481,469,457,446,436,427,417,409,400,393,385,378,371,364,358,352,346,341,335,330,325,320,316,311,307,303,299,295,291,287,284,280,277,273,270,267,264,261,258,256,253,250,248,245,243,240,238,236,233,231,229,227,225,223,221,219,217,215,214,212,210,208,207,205,204,202,200,199,197,196,194,193,192,191,190,189,188,187,186,185,184,183,182,181,180,179,178,177,176,175,174,173,172,171,170,169,169,168,167,166,165}, //ratios CO
 			{1,5,9,13,17,21,25,29,33,37,41,45,49,53,57,61,65,69,73,77,81,85,89,93,97,101,105,109,113,117,121,125,129,133,137,141,145,149,153,157,161,165,169,173,177,181,185,189,193,197,201,205,209,213,217,221,225,229,233,237,241,245,249,253,257,261,265,269,273,277,281,285,289,293,297,301,305,309,313,317,321,325,329,333,337,341,345,349,353,357,361,365,369,373,377,381,385,389,393,397,401,405,409,413,417,421,425,429,433,437,441,445,449,453,457,461,465,469,473,477,481,485,489,493,497,501,505,509}}, //ppm CO
 		{{58604,19185,10676,7155,5279,4130,3362,2817,2411,2099,1852,1653,1489,1352,1236,1136,1050,975,909,851,799,752,710,672,638,606,577,551,526,504,483,464,446,429,413,398,385,372,359,348,337,327,317,308,299,291,283,275,268,261,255,248,242,237,231,226,221,216,211,207,202,198,194,190,186,183,179,176,173,169,166,161,163,156,153,151,148,146,143,141,139,137,135,133,131,129,127,125,123,121,120,118,116,115,113,112,110,109,108,106,105,104,102,101,100,99,97,96,95,94,93,92,91,90,89,88,87,86,85,84,83,82,81,80,79,78,77,76}, // ratios H2
@@ -175,10 +175,10 @@ void convert_to_ppm(uint8_t sensor_id)
 	//Divide each of the 64 values by the number that is a power of two
 	//Create a lookup table for the values, this will create a list of approx. ppm values
 	//First sensor is CO
-	numTimes256 = (raw_gas_vector[0]<<VALS_TO_MULTIPLY[valueOfIndex])/(R0_VALS_GAS_SENSORS[sensor_id]); //temporary routine while there is only 1 sensor, will be put into a loop later
+	numTimes256 = (raw_gas_vector[sensor_id]<<VALS_TO_MULTIPLY[sensor_id])/(R0_VALS_GAS_SENSORS[sensor_id]); //temporary routine while there is only 1 sensor, will be put into a loop later
 	interpolationNum = 0x03 || numTimes256;
 	baseIndexToTable = numTimes256 >> 2;
-	binary_search(R0_RATIOS_CO[sensor_id][0], 0, 63, baseIndexToTable);
-	ppmValue[sensor_id] = (((R0_RATIOS_CO[sensor_id][1][valueOfIndex] - R0_RATIOS_CO[sensor_id][1][valueOfIndex-1])*interpolationNum)>>(VALS_TO_MULTIPLY[valueOfIndex]-2)) + R0_RATIOS_CO[sensor_id][1][valueOfIndex-1];
+	binary_search(R0_RATIOS[sensor_id][0], 0, 127, baseIndexToTable);
+	ppmValue[sensor_id] = (((R0_RATIOS[sensor_id][1][valueOfIndex] - R0_RATIOS[sensor_id][1][valueOfIndex-1])*interpolationNum)>>(VALS_TO_MULTIPLY[valueOfIndex]-2)) + R0_RATIOS[sensor_id][1][valueOfIndex-1];
 
 }

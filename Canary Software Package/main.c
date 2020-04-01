@@ -240,6 +240,7 @@ int main(void)
 				printf(",");
 				printf(altitude);
 				printf("|");
+				printf("5,%d,%d,%d,%d,%d|", ppmValue[0], ppmValue[1], ppmValue[2], ppmValue[3], ppmValue[4]);
 			}
 			//re-enable the GPS receiver & interrupt after processing all sensor data
 			UCSR1B |= ((1<<RXCIE1)|(1<<RXEN1));

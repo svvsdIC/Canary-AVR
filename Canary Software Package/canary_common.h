@@ -83,6 +83,8 @@ static FILE mystdout = FDEV_SETUP_STREAM(USART0_Transmit_IO, NULL, _FDEV_SETUP_W
 static uint8_t UART0TransmitInProgress;
 
 static volatile uint8_t waiting;
+
+
 /********************************************************************************
 						Function Prototypes
 ********************************************************************************/

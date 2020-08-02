@@ -26,8 +26,6 @@
 // These first few variables are here for debug purposes... ---UART STUFF
 extern char messageWant [UART1_RX_BUFFER_SIZE];
 uint8_t printType = 1;
-//look up tables - taken from Aileen sensor order is: CO, H , NH3, CH4, O3
-
 /********************************************************************************
 						Functions
 ********************************************************************************/
@@ -92,7 +90,7 @@ int main(void)
 	//
 	// Wait here for the start/standby button to be selected.. (PORTB pin 3).
 	
-	while(BitIsSet(PINB,PINB3)) {}//makes program wait until everything is ready(button is pushed) //not working we don't know why
+	while(BitIsSet(PINB,PINB3)) {}//makes program wait until everything is ready(button is pushed)
 	//
 	//Proceed to main loop with warning to ground system re: GPSlock
 // 	if (GPSlock==1) 
@@ -130,7 +128,7 @@ int main(void)
 			// The GPS message triggers the whole collection cycle, so we can send it now...
 			while(UART0TransmitInProgress) {}
 			//
-			// For this simple approach, we should probably visit the sensors in the following order:
+			// For this simple approach, we should visit the sensors in the following order:
 			//   1. Write the most recent GPS position to UART0
 			//   2. Kick off the gas sensor reads - and go back for the results in a few milliseconds.  
 			//   2. Read the LIDAR distance and send it over UART0
@@ -154,27 +152,22 @@ int main(void)
 			// Now test the gas sensor interface...
 			start_gas_sensor_read();
 			// Note that this is a blocking read (stops all other activity)
-			// At present, the print statements are in that routine....
-			//...but the routine needs to be redesigned to operate in the background
-			//
-			//============================
 			// Now read the BME interface...
 	 		bme280basic_bulk_data_read();
- 			// Calculate the temperature and print it
+ 			// Calculate the temperature
 			tempCelsius = BME280_compensate_T_int32(rawTemp);
- 			// Calculate the pressure and print it
+ 			// Calculate the pressure
 			pressure = BME280_compensate_P_int64(rawPress);
 			//Actual pressure calculation in Pa (FROM DATASHEET)
 			pressure = pressure >> 8;
- 			// Calculate the humidity and print it
+ 			// Calculate the humidity
 			humidity = bme280_compensate_H_int32(rawHum);
-			
-			//
 			//============================
-			
+			//convert gas sensor ADC values to PWM
 			for(int i = 0; i < 5; i++)
 			{
-				convert_to_ppm(i); 
+				//default is board B, Board C is 2
+				convert_to_ppm(i,tempCelsius,humidity,1); 
 			}
 			//print statements
 			// ----------- debug -------------- //

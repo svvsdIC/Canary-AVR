@@ -53,6 +53,8 @@ volatile int interpolationNum;
 volatile int numTimes256;
 volatile int ppmValue[6];
 volatile int valueOfIndex;
+
+
 /********************************************************************************
 						Function Prototypes
 ********************************************************************************/
@@ -60,7 +62,7 @@ void get_gas_sensor_limits(void);
 void get_gas_sensor_limits_from_EEPROM(void);
 void gas_sensors_init(void);
 void start_gas_sensor_read(void);
-void convert_to_ppm(uint8_t sensor_id);
+void convert_to_ppm(uint8_t sensor_id, int32_t tempCelsius, int32_t humidity, int board);
 void binary_search(int[], int, int, int);
 
 #endif /* GAS_SENSORS_H_ */

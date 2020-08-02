@@ -20,7 +20,7 @@
 						Functions
 ********************************************************************************/
 void BME_read_correction_coefficients(void) {
-	// This routine (will) reads the corrective coefficients for temperature, pressure, and humidity...
+	// This routine reads the corrective coefficients for temperature, pressure, and humidity...
 	static uint8_t i;
 	static volatile uint8_t BMEbusy = 1;
 	while (BMEbusy) {
